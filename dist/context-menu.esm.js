@@ -121,9 +121,13 @@ var script = /*#__PURE__*/defineComponent({
     watchEffect(() => {
       __menuOptionsMap.value = new Map();
       props.options.forEach(m => {
-        let name = m.name ?? `no-name-${Math.random().toString().slice(2, 5)}`;
+        var _m$name;
+
+        let name = (_m$name = m.name) !== null && _m$name !== void 0 ? _m$name : `no-name-${Math.random().toString().slice(2, 5)}`;
         const events = Array.isArray(m.on) ? m.on : Array(m.on);
         events.forEach(e => {
+          var _menuOptionsMap$valu;
+
           if (!e) return;
           let btn = undefined;
           if (/(main|left)/.test(e)) btn = "main";else if (/(sec|right)/.test(e)) btn = "secondary";else if (/(aux)/.test(e)) btn = "auxiliar";
@@ -132,7 +136,7 @@ var script = /*#__PURE__*/defineComponent({
           let mod = "_";
           if (/ctrl\./.test(e)) mod = "_ctrl_";else if (/alt\./.test(e)) mod = "_alt_";else if (/shift\./.test(e)) mod = "_shift_";else if (/meta\./.test(e)) mod = "_meta_";
           const menuName = `${ev}${mod}${btn}`;
-          const menu = __menuOptionsMap.value.get(menuName) ?? [];
+          const menu = (_menuOptionsMap$valu = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu !== void 0 ? _menuOptionsMap$valu : [];
 
           __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof m === "object" ? m : {}),
             name
@@ -148,6 +152,8 @@ var script = /*#__PURE__*/defineComponent({
     const contextMenu = ref([]);
 
     const showContextMenu = (event, ev, btn) => {
+      var _id, _id2;
+
       visible.value = false;
       contextMenu.value = [];
       const t = event; // let id = t.target.id ?? ""
@@ -164,8 +170,8 @@ var script = /*#__PURE__*/defineComponent({
         });
       }
 
-      item.value = id ?? "";
-      if ((id ?? "").length < 1) return;
+      item.value = (_id = id) !== null && _id !== void 0 ? _id : "";
+      if (((_id2 = id) !== null && _id2 !== void 0 ? _id2 : "").length < 1) return;
       let mod = "_";
       if (event.ctrlKey) mod = "_ctrl_";else if (event.altKey) mod = "_alt_";else if (event.shiftKey) mod = "_shift_";else if (event.metaKey) mod = "_meta_";
       const menuName = `${ev}${mod}${btn}`;
@@ -236,18 +242,20 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
     label,
     icon
   }, index) => {
+    var _ref;
+
     return openBlock(), createBlock(Fragment, {
       key: index
     }, [type === 'divider' ? (openBlock(), createBlock("li", _hoisted_1)) : (openBlock(), createBlock("li", {
       key: 1,
-      onClick: withModifiers($event => _ctx.optionClicked(name ?? ''), ["stop"])
+      onClick: withModifiers($event => _ctx.optionClicked(name !== null && name !== void 0 ? name : ''), ["stop"])
     }, [_ctx.iconFormat === 'class' ? (openBlock(), createBlock("i", {
       key: 0,
       class: icon
     }, null, 2)) : (openBlock(), createBlock("i", {
       key: 1,
       class: _ctx.iconFormat
-    }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString(label ?? name ?? ""), 1)], 8, ["onClick"]))], 64);
+    }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString((_ref = label !== null && label !== void 0 ? label : name) !== null && _ref !== void 0 ? _ref : ""), 1)], 8, ["onClick"]))], 64);
   }), 128))], 6), [[_directive_click_outside, _ctx.onClickOutsideConf]]), createVNode("div", mergeProps(_ctx.$attrs, {
     class: "context-menu__content",
     onClick: _cache[1] || (_cache[1] = withModifiers($event => _ctx.onClick($event, 'click', 'main'), ["left", "prevent", "stop"])),
