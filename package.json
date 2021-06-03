@@ -2,7 +2,7 @@
   "name": "vue-context-menu",
   "version": "1.0.0",
   "description": "Support for contextual menus on vue",
-  "license": "All Rights Reserved",
+  "license": "MIT",
   "main": "dist/context-menu.ssr.js",
   "browser": "dist/context-menu.esm.js",
   "module": "dist/context-menu.esm.js",
@@ -21,7 +21,9 @@
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
   },
-  "dependencies": {},
+  "dependencies": {
+    "click-outside-vue3": "https://github.com/andymark-by/click-outside-vue3.git"
+  },
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
