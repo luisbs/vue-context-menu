@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Support for contextual menus on vue",
   "license": "MIT",
+  "author": "https://github.com/luisbs",
+  "repository": "https://github.com/luisbs/vue-context-menu",
   "main": "dist/context-menu.ssr.js",
   "browser": "dist/context-menu.esm.js",
   "module": "dist/context-menu.esm.js",

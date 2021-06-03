@@ -267,5 +267,3 @@ export default /*#__PURE__*/ defineComponent({
   },
 })
 </script>
-
-</script>
