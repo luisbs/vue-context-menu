@@ -364,9 +364,9 @@ var script = /*#__PURE__*/vue.defineComponent({
       })
     };
   }
-});var _withId = /*#__PURE__*/vue.withScopeId("data-v-0f415512");
+});var _withId = /*#__PURE__*/vue.withScopeId("data-v-616c0e36");
 
-vue.pushScopeId("data-v-0f415512");
+vue.pushScopeId("data-v-616c0e36");
 
 var _hoisted_1 = {
   key: 0,
@@ -378,7 +378,25 @@ vue.popScopeId();
 var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_click_outside = vue.resolveDirective("click-outside");
 
-  return vue.openBlock(), vue.createBlock(vue.Fragment, null, [vue.withDirectives(vue.createVNode("ul", {
+  return vue.openBlock(), vue.createBlock(vue.Fragment, null, [vue.createVNode("div", vue.mergeProps(_ctx.$attrs, {
+    class: "context-menu__content",
+    onClick: _cache[1] || (_cache[1] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'click', 'main');
+    }, ["left", "prevent", "stop"])),
+    onMouseup: _cache[2] || (_cache[2] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'click', 'auxiliar');
+    }, ["middle", "prevent", "stop"])),
+    onContextmenu: _cache[3] || (_cache[3] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'click', 'secondary');
+    }, ["right", "prevent", "stop"])),
+    onDblclick: [_cache[4] || (_cache[4] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'dblclick', 'main');
+    }, ["left", "prevent", "stop"])), _cache[5] || (_cache[5] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'dblclick', 'auxiliar');
+    }, ["middle", "prevent", "stop"])), _cache[6] || (_cache[6] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'dblclick', 'secondary');
+    }, ["right", "prevent", "stop"]))]
+  }), [vue.renderSlot(_ctx.$slots, "default")], 16), vue.withDirectives(vue.createVNode("ul", {
     class: ["context-menu", {
       'context-menu--active': _ctx.visible
     }],
@@ -404,25 +422,7 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
       key: 1,
       class: _ctx.iconFormat
     }, vue.toDisplayString(icon), 3)), vue.createVNode("span", null, vue.toDisplayString((_ref2 = label !== null && label !== void 0 ? label : name) !== null && _ref2 !== void 0 ? _ref2 : ""), 1)], 8, ["onClick"]))], 64);
-  }), 128))], 6), [[_directive_click_outside, _ctx.onClickOutsideConf]]), vue.createVNode("div", vue.mergeProps(_ctx.$attrs, {
-    class: "context-menu__content",
-    onClick: _cache[1] || (_cache[1] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'click', 'main');
-    }, ["left", "prevent", "stop"])),
-    onMouseup: _cache[2] || (_cache[2] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'click', 'auxiliar');
-    }, ["middle", "prevent", "stop"])),
-    onContextmenu: _cache[3] || (_cache[3] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'click', 'secondary');
-    }, ["right", "prevent", "stop"])),
-    onDblclick: [_cache[4] || (_cache[4] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'dblclick', 'main');
-    }, ["left", "prevent", "stop"])), _cache[5] || (_cache[5] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'dblclick', 'auxiliar');
-    }, ["middle", "prevent", "stop"])), _cache[6] || (_cache[6] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'dblclick', 'secondary');
-    }, ["right", "prevent", "stop"]))]
-  }), [vue.renderSlot(_ctx.$slots, "default")], 16)], 64);
+  }), 128))], 6), [[_directive_click_outside, _ctx.onClickOutsideConf]])], 64);
 });function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
@@ -448,9 +448,9 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
   } else {
     style.appendChild(document.createTextNode(css));
   }
-}var css_248z = "\n.context-menu[data-v-0f415512] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: none;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu.context-menu--active[data-v-0f415512] {\n  display: block;\n}\n.context-menu > li[data-v-0f415512] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-0f415512]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-0f415512] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-0f415512]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-0f415512]:last-of-type {\n  margin-bottom: 4px;\n}\n";
+}var css_248z = "\n.context-menu[data-v-616c0e36] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: none;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu.context-menu--active[data-v-616c0e36] {\n  display: block;\n}\n.context-menu > li[data-v-616c0e36] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-616c0e36]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-616c0e36] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-616c0e36]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-616c0e36]:last-of-type {\n  margin-bottom: 4px;\n}\n";
 styleInject(css_248z);script.render = render;
-script.__scopeId = "data-v-0f415512";// Default export is installable instance of component.
+script.__scopeId = "data-v-616c0e36";// Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
 // to be registered via Vue.use() as well as Vue.component(),
 var component = /*#__PURE__*/(function () {

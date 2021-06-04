@@ -1,16 +1,4 @@
 <template>
-  <ul class="context-menu" :class="{ 'context-menu--active': visible }" :style="location" v-click-outside="onClickOutsideConf">
-    <template v-for="({ type, name, label, icon }, index) in contextMenu" :key="index">
-      <li v-if="type === 'divider'" class="context-menu__divider" />
-
-      <li v-else @click.stop="optionClicked(name ?? '')">
-        <i v-if="iconFormat === 'class'" :class="icon" />
-        <i v-else :class="iconFormat">{{ icon }}</i>
-        <span>{{ label ?? name ?? "" }}</span>
-      </li>
-    </template>
-  </ul>
-
   <!-- eslint-disable-next-line -->
   <div
     v-bind="$attrs"
@@ -24,6 +12,18 @@
   >
     <slot />
   </div>
+
+  <ul class="context-menu" :class="{ 'context-menu--active': visible }" :style="location" v-click-outside="onClickOutsideConf">
+    <template v-for="({ type, name, label, icon }, index) in contextMenu" :key="index">
+      <li v-if="type === 'divider'" class="context-menu__divider" />
+
+      <li v-else @click.stop="optionClicked(name ?? '')">
+        <i v-if="iconFormat === 'class'" :class="icon" />
+        <i v-else :class="iconFormat">{{ icon }}</i>
+        <span>{{ label ?? name ?? "" }}</span>
+      </li>
+    </template>
+  </ul>
 </template>
 
 <style scoped>
