@@ -85,7 +85,6 @@ var script = /*#__PURE__*/defineComponent({
   setup(props, {
     emit
   }) {
-    const item = ref(0);
     const visible = ref(false);
 
     const hideContextMenu = () => visible.value = false;
@@ -155,30 +154,39 @@ var script = /*#__PURE__*/defineComponent({
         x: event.pageX - props.offsetX,
         y: event.pageY - props.offsetY
       };
+    }; // ? Controls wich element has been clicked
+
+
+    const selectedItem = ref();
+
+    const setSelectedItem = event => {
+      try {
+        const t = event;
+        let id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
+
+        for (const el of t.path) {
+          var _el$classList;
+
+          if (el !== null && el !== void 0 && (_el$classList = el.classList) !== null && _el$classList !== void 0 && _el$classList.contains(props.delimiter)) {
+            selectedItem.value = id;
+            return id;
+          } // ? Store child id
+          else id = el.id;
+        }
+      } catch (error) {
+        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`);
+      }
+
+      selectedItem.value = undefined;
+      return undefined;
     }; // ? Actualizar el menu mostrado
 
 
     const contextMenu = ref([]);
 
     const showContextMenu = (event, ev, btn) => {
-      var _id, _id2;
-
-      const t = event; // let id = t.target.id ?? ""
-
-      let id = undefined;
-
-      if (t.path) {
-        // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
-        t.path.some(p => {
-          var _p$classList;
-
-          if (p !== null && p !== void 0 && (_p$classList = p.classList) !== null && _p$classList !== void 0 && _p$classList.contains(props.delimiter)) return true;
-          id = p.id;
-        });
-      }
-
-      item.value = (_id = id) !== null && _id !== void 0 ? _id : "";
-      if (((_id2 = id) !== null && _id2 !== void 0 ? _id2 : "").length < 1) return;
+      const id = setSelectedItem(event);
+      if (!id || id.length < 1) return;
       let mod = "_";
       if (event.ctrlKey) mod = "_ctrl_";else if (event.altKey) mod = "_alt_";else if (event.shiftKey) mod = "_shift_";else if (event.metaKey) mod = "_meta_";
       const menuName = `${ev}${mod}${btn}`;
@@ -196,12 +204,17 @@ var script = /*#__PURE__*/defineComponent({
     const slotContextMenu = ref();
 
     const showSlotMenu = event => {
-      if (typeof props.options !== 'string') slotContextMenu.value = undefined;else {
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        setLocation(event);
-        slotContextMenu.value = props.options;
+      const id = setSelectedItem(event);
+
+      if (typeof props.options !== 'string' || !id || id.length < 1) {
+        slotContextMenu.value = undefined;
+        return;
       }
+
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      setLocation(event);
+      slotContextMenu.value = props.options;
     };
 
     return {
@@ -210,8 +223,13 @@ var script = /*#__PURE__*/defineComponent({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`
       })),
-      slotContextMenu,
       contextMenu,
+      slotContextMenu,
+      selectedItem: computed(() => {
+        var _selectedItem$value;
+
+        return (_selectedItem$value = selectedItem.value) !== null && _selectedItem$value !== void 0 ? _selectedItem$value : "";
+      }),
       onClick: (event, mode, btn) => {
         visible.value = false;
         if (props.active === false) return;
@@ -223,7 +241,7 @@ var script = /*#__PURE__*/defineComponent({
         hideContextMenu();
         emit("optionClick", {
           action,
-          item: item.value
+          item: selectedItem.value
         });
       },
 
@@ -237,7 +255,7 @@ var script = /*#__PURE__*/defineComponent({
 
 });
 
-const _withId = /*#__PURE__*/withScopeId("data-v-12140889");
+const _withId = /*#__PURE__*/withScopeId("data-v-61946dac");
 
 const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $options) => {
   const _directive_click_outside = resolveDirective("click-outside");
@@ -251,7 +269,9 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
   }), [renderSlot(_ctx.$slots, "default")], 16), _ctx.visible ? (openBlock(), createBlock(Fragment, {
     key: 0
   }, [_ctx.slotContextMenu ? renderSlot(_ctx.$slots, _ctx.slotContextMenu, {
-    key: 0
+    key: 0,
+    item: _ctx.selectedItem,
+    onClick: _ctx.optionClicked
   }) : createCommentVNode("", true), withDirectives(createVNode("ul", {
     class: "context-menu",
     style: _ctx.location
@@ -268,7 +288,8 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
     return openBlock(), createBlock(Fragment, {
       key: index
     }, [slotName ? renderSlot(_ctx.$slots, slotName, {
-      key: 0
+      key: 0,
+      onClick: _ctx.optionClicked
     }) : createCommentVNode("", true), type === 'divider' ? (openBlock(), createBlock("li", {
       key: 1,
       class: ["context-menu__divider", className]
@@ -313,11 +334,11 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = "\n.context-menu[data-v-12140889] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu > li[data-v-12140889] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-12140889]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-12140889] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-12140889]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-12140889]:last-of-type {\n  margin-bottom: 4px;\n}\n";
+var css_248z = "\n.context-menu[data-v-61946dac] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu > li[data-v-61946dac] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-61946dac]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-61946dac] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-61946dac]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-61946dac]:last-of-type {\n  margin-bottom: 4px;\n}\n";
 styleInject(css_248z);
 
 script.render = render;
-script.__scopeId = "data-v-12140889";
+script.__scopeId = "data-v-61946dac";
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component

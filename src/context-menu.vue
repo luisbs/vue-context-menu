@@ -14,11 +14,11 @@
   </div>
 
   <template v-if="visible">
-    <slot v-if="slotContextMenu" :name="slotContextMenu" />
+    <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
 
     <ul class="context-menu" :style="location" v-click-outside="onClickOutsideConf">
       <template v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
-        <slot v-if="slotName" :name="slotName" />
+        <slot v-if="slotName" :name="slotName" :onClick="optionClicked" />
 
         <li v-if="type === 'divider'" class="context-menu__divider" :class="className" />
 
@@ -142,7 +142,6 @@ export default /*#__PURE__*/ defineComponent({
     },
   },
   setup(props, { emit }) {
-    const item = ref<string | number>(0)
     const visible = ref(false)
 
     const hideContextMenu = () => (visible.value = false)
@@ -211,25 +210,37 @@ export default /*#__PURE__*/ defineComponent({
         }
     }
 
+    // ? Controls wich element has been clicked
+    const selectedItem = ref<string>()
+    const setSelectedItem = (event: MouseEvent): string | undefined => {
+      try {
+        const t = (event as unknown) as { path: HTMLElement[] }
+
+        let id: string | undefined = undefined
+        // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
+        for (const el of t.path) {
+          if (el?.classList?.contains(props.delimiter)) {
+            selectedItem.value = id
+            return id
+          }
+
+          // ? Store child id
+          else id = el.id
+        }
+
+      } catch (error) {
+        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`);
+      }
+      selectedItem.value = undefined
+      return undefined
+    }
+
+
     // ? Actualizar el menu mostrado
     const contextMenu = ref<ContextualMenuOption[]>([])
     const showContextMenu = (event: MouseEvent, ev: MouseClick, btn: MouseOptionButtons) => {
-      const t = (event as unknown) as {
-        path: HTMLElement[]
-        target: HTMLElement
-      }
-
-      // let id = t.target.id ?? ""
-      let id: string | undefined = undefined
-      if (t.path) {
-        // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
-        t.path.some(p => {
-          if (p?.classList?.contains(props.delimiter)) return true
-          id = p.id
-        })
-      }
-      item.value = id ?? ""
-      if ((id ?? "").length < 1) return
+      const id = setSelectedItem(event)
+      if (!id || id.length < 1) return
 
       let mod = "_"
       if (event.ctrlKey) mod = "_ctrl_"
@@ -252,14 +263,17 @@ export default /*#__PURE__*/ defineComponent({
 
     const slotContextMenu = ref<string>()
     const showSlotMenu = (event: MouseEvents) => {
-      if (typeof props.options !== 'string') slotContextMenu.value = undefined
-      else {
-        event.stopImmediatePropagation()
-        event.preventDefault()
-
-        setLocation(event)
-        slotContextMenu.value = props.options
+      const id = setSelectedItem(event)
+      if (typeof props.options !== 'string' || !id || id.length < 1) {
+        slotContextMenu.value = undefined
+        return
       }
+
+      event.stopImmediatePropagation()
+      event.preventDefault()
+
+      setLocation(event)
+      slotContextMenu.value = props.options
     }
 
     return {
@@ -269,8 +283,9 @@ export default /*#__PURE__*/ defineComponent({
         top: `${location.value.y}px`,
       })),
 
-      slotContextMenu,
       contextMenu,
+      slotContextMenu,
+      selectedItem: computed(() => selectedItem.value ?? ""),
       onClick: (event: MouseEvent, mode: MouseClick, btn: MouseOptionButtons) => {
         visible.value = false
         if (props.active === false) return
@@ -283,7 +298,7 @@ export default /*#__PURE__*/ defineComponent({
 
       optionClicked(action: string) {
         hideContextMenu()
-        emit("optionClick", { action, item: item.value })
+        emit("optionClick", { action, item: selectedItem.value })
       },
 
       // ? Configuration for click outside directive
