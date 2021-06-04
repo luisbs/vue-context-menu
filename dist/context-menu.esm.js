@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, createCommentVNode, toDisplayString, withScopeId } from 'vue';
+import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, createCommentVNode, withDirectives, renderList, toDisplayString, withScopeId } from 'vue';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -237,7 +237,7 @@ var script = /*#__PURE__*/defineComponent({
 
 });
 
-const _withId = /*#__PURE__*/withScopeId("data-v-20aeb5f8");
+const _withId = /*#__PURE__*/withScopeId("data-v-12140889");
 
 const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $options) => {
   const _directive_click_outside = resolveDirective("click-outside");
@@ -248,16 +248,14 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
     onMouseup: _cache[2] || (_cache[2] = withModifiers($event => _ctx.onClick($event, 'click', 'auxiliar'), ["middle", "prevent", "stop"])),
     onContextmenu: _cache[3] || (_cache[3] = withModifiers($event => _ctx.onClick($event, 'click', 'secondary'), ["right", "prevent", "stop"])),
     onDblclick: [_cache[4] || (_cache[4] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'main'), ["left", "prevent", "stop"])), _cache[5] || (_cache[5] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'auxiliar'), ["middle", "prevent", "stop"])), _cache[6] || (_cache[6] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'secondary'), ["right", "prevent", "stop"]))]
-  }), [renderSlot(_ctx.$slots, "default")], 16), withDirectives(createVNode("ul", {
-    class: ["context-menu", {
-      'context-menu--active': _ctx.visible
-    }],
-    style: _ctx.location
+  }), [renderSlot(_ctx.$slots, "default")], 16), _ctx.visible ? (openBlock(), createBlock(Fragment, {
+    key: 0
   }, [_ctx.slotContextMenu ? renderSlot(_ctx.$slots, _ctx.slotContextMenu, {
     key: 0
-  }) : (openBlock(true), createBlock(Fragment, {
-    key: 1
-  }, renderList(_ctx.contextMenu, ({
+  }) : createCommentVNode("", true), withDirectives(createVNode("ul", {
+    class: "context-menu",
+    style: _ctx.location
+  }, [(openBlock(true), createBlock(Fragment, null, renderList(_ctx.contextMenu, ({
     type,
     name,
     label,
@@ -285,7 +283,7 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
       key: 1,
       class: _ctx.iconFormat
     }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString((_ref = label !== null && label !== void 0 ? label : name) !== null && _ref !== void 0 ? _ref : ""), 1)], 10, ["onClick"]))], 64);
-  }), 128))], 6), [[_directive_click_outside, _ctx.onClickOutsideConf]])], 64);
+  }), 128))], 4), [[_directive_click_outside, _ctx.onClickOutsideConf]])], 64)) : createCommentVNode("", true)], 64);
 });
 
 function styleInject(css, ref) {
@@ -315,11 +313,11 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = "\n.context-menu[data-v-20aeb5f8] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: none;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu.context-menu--active[data-v-20aeb5f8] {\n  display: block;\n}\n.context-menu > li[data-v-20aeb5f8] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-20aeb5f8]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-20aeb5f8] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-20aeb5f8]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-20aeb5f8]:last-of-type {\n  margin-bottom: 4px;\n}\n";
+var css_248z = "\n.context-menu[data-v-12140889] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu > li[data-v-12140889] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-12140889]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-12140889] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-12140889]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-12140889]:last-of-type {\n  margin-bottom: 4px;\n}\n";
 styleInject(css_248z);
 
 script.render = render;
-script.__scopeId = "data-v-20aeb5f8";
+script.__scopeId = "data-v-12140889";
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component

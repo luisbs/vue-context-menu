@@ -13,21 +13,23 @@
     <slot />
   </div>
 
-  <ul class="context-menu" :class="{ 'context-menu--active': visible }" :style="location" v-click-outside="onClickOutsideConf">
+  <template v-if="visible">
     <slot v-if="slotContextMenu" :name="slotContextMenu" />
 
-    <template v-else v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
-      <slot v-if="slotName" :name="slotName" />
+    <ul class="context-menu" :style="location" v-click-outside="onClickOutsideConf">
+      <template v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
+        <slot v-if="slotName" :name="slotName" />
 
-      <li v-if="type === 'divider'" class="context-menu__divider" :class="className" />
+        <li v-if="type === 'divider'" class="context-menu__divider" :class="className" />
 
-      <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
-        <i v-if="iconFormat === 'class'" :class="icon" />
-        <i v-else :class="iconFormat">{{ icon }}</i>
-        <span>{{ label ?? name ?? "" }}</span>
-      </li>
-    </template>
-  </ul>
+        <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
+          <i v-if="iconFormat === 'class'" :class="icon" />
+          <i v-else :class="iconFormat">{{ icon }}</i>
+          <span>{{ label ?? name ?? "" }}</span>
+        </li>
+      </template>
+    </ul>
+  </template>
 </template>
 
 <style scoped>
@@ -44,7 +46,7 @@
   left: 0;
   margin: 0;
   padding: 0;
-  display: none;
+  display: block;
   list-style: none;
   position: absolute;
   z-index: 1000000;
@@ -54,9 +56,6 @@
     "Helvetica Neue", sans-serif;
   box-shadow: 0 3px 6px 0 var(--cm-black-shadow);
   border-radius: 4px;
-}
-.context-menu.context-menu--active {
-  display: block;
 }
 
 .context-menu > li {
