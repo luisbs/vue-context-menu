@@ -18,13 +18,15 @@ export type MouseEvents =
 export interface ContextualMenuOption {
   /** Unique name to identify the action, replace 'label' if not defined */
   name?: string
+  /** Use a name slot instead of the auto-genrated li element */
+  slot?: string
   /** Generates a divider */
   type?: "divider"
   /** Text to show on the menu */
   label?: string
   /** Icon to show on the menu */
   icon?: string
-  /** Classname to be added to the menu option */
+  /** Classname to be added to the menu li option */
   class?: string
   /** Defines specific items to have this menu option */
   scope?: string | string[]

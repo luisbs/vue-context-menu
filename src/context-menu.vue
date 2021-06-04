@@ -14,10 +14,14 @@
   </div>
 
   <ul class="context-menu" :class="{ 'context-menu--active': visible }" :style="location" v-click-outside="onClickOutsideConf">
-    <template v-for="({ type, name, label, icon }, index) in contextMenu" :key="index">
-      <li v-if="type === 'divider'" class="context-menu__divider" />
+    <slot v-if="slotContextMenu" :name="slotContextMenu" />
 
-      <li v-else @click.stop="optionClicked(name ?? '')">
+    <template v-else v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
+      <slot v-if="slotName" :name="slotName" />
+
+      <li v-if="type === 'divider'" class="context-menu__divider" :class="className" />
+
+      <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
         <i v-if="iconFormat === 'class'" :class="icon" />
         <i v-else :class="iconFormat">{{ icon }}</i>
         <span>{{ label ?? name ?? "" }}</span>
@@ -106,7 +110,7 @@ export default /*#__PURE__*/ defineComponent({
      * Defines the contextual menu options
      * @see `ContextualMenuOption` type for details.
      */
-    options: { type: Array, required: true },
+    options: { type: [String, Array], required: true },
     /** Defines when the context menu is active */
     active: { type: Boolean, default: true },
     /**
@@ -169,6 +173,8 @@ export default /*#__PURE__*/ defineComponent({
     // ? Mantener sincronizado el conjunto de posibles menus
     const __menuOptionsMap = ref<MenuOptions>(new Map())
     watchEffect(() => {
+      if (typeof props.options === 'string') return
+
       __menuOptionsMap.value = new Map()
       ;(props.options as ContextualMenuOption[]).forEach(m => {
         let name = m.name ?? `no-name-${Math.random().toString().slice(2, 5)}`
@@ -198,13 +204,17 @@ export default /*#__PURE__*/ defineComponent({
       })
     })
 
-    // ? Actualizar el menu mostrado
     const location = ref<Record<"x" | "y", number>>({ x: 0, y: 0 })
+    const setLocation = (event: MouseEvent) => {
+        location.value = {
+          x: event.pageX - props.offsetX,
+          y: event.pageY - props.offsetY,
+        }
+    }
+
+    // ? Actualizar el menu mostrado
     const contextMenu = ref<ContextualMenuOption[]>([])
     const showContextMenu = (event: MouseEvent, ev: MouseClick, btn: MouseOptionButtons) => {
-      visible.value = false
-      contextMenu.value = []
-
       const t = (event as unknown) as {
         path: HTMLElement[]
         target: HTMLElement
@@ -231,27 +241,46 @@ export default /*#__PURE__*/ defineComponent({
       const menuName = `${ev}${mod}${btn}` as MenuOptionName
       const menu = __menuOptionsMap.value.get(menuName)
 
-      if (menu) {
-        contextMenu.value = menu
-        location.value = {
-          x: event.pageX - props.offsetX,
-          y: event.pageY - props.offsetY,
-        }
-        visible.value = props.active
-
+      if (!menu) contextMenu.value = []
+      else {
         event.stopImmediatePropagation()
         event.preventDefault()
+
+        setLocation(event)
+        contextMenu.value = menu
+      }
+    }
+
+    const slotContextMenu = ref<string>()
+    const showSlotMenu = (event: MouseEvents) => {
+      if (typeof props.options !== 'string') slotContextMenu.value = undefined
+      else {
+        event.stopImmediatePropagation()
+        event.preventDefault()
+
+        setLocation(event)
+        slotContextMenu.value = props.options
       }
     }
 
     return {
-      contextMenu,
       visible: computed(() => props.active && visible.value),
       location: computed(() => ({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`,
       })),
-      onClick: (event: MouseEvent, mode: MouseClick, btn: MouseOptionButtons) => showContextMenu(event, mode, btn),
+
+      slotContextMenu,
+      contextMenu,
+      onClick: (event: MouseEvent, mode: MouseClick, btn: MouseOptionButtons) => {
+        visible.value = false
+        if (props.active === false) return
+
+        if (typeof props.options === 'string') showSlotMenu(event)
+        else showContextMenu(event, mode, btn)
+
+        visible.value = true
+      },
 
       optionClicked(action: string) {
         hideContextMenu()

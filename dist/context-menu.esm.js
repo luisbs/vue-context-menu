@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, pushScopeId, popScopeId, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, toDisplayString, withScopeId } from 'vue';
+import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, createCommentVNode, toDisplayString, withScopeId } from 'vue';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -26,7 +26,7 @@ var script = /*#__PURE__*/defineComponent({
      * @see `ContextualMenuOption` type for details.
      */
     options: {
-      type: Array,
+      type: [String, Array],
       required: true
     },
 
@@ -119,6 +119,7 @@ var script = /*#__PURE__*/defineComponent({
     const __menuOptionsMap = ref(new Map());
 
     watchEffect(() => {
+      if (typeof props.options === 'string') return;
       __menuOptionsMap.value = new Map();
       props.options.forEach(m => {
         var _m$name;
@@ -143,19 +144,25 @@ var script = /*#__PURE__*/defineComponent({
           }]);
         });
       });
-    }); // ? Actualizar el menu mostrado
-
+    });
     const location = ref({
       x: 0,
       y: 0
     });
+
+    const setLocation = event => {
+      location.value = {
+        x: event.pageX - props.offsetX,
+        y: event.pageY - props.offsetY
+      };
+    }; // ? Actualizar el menu mostrado
+
+
     const contextMenu = ref([]);
 
     const showContextMenu = (event, ev, btn) => {
       var _id, _id2;
 
-      visible.value = false;
-      contextMenu.value = [];
       const t = event; // let id = t.target.id ?? ""
 
       let id = undefined;
@@ -178,26 +185,39 @@ var script = /*#__PURE__*/defineComponent({
 
       const menu = __menuOptionsMap.value.get(menuName);
 
-      if (menu) {
-        contextMenu.value = menu;
-        location.value = {
-          x: event.pageX - props.offsetX,
-          y: event.pageY - props.offsetY
-        };
-        visible.value = props.active;
+      if (!menu) contextMenu.value = [];else {
         event.stopImmediatePropagation();
         event.preventDefault();
+        setLocation(event);
+        contextMenu.value = menu;
+      }
+    };
+
+    const slotContextMenu = ref();
+
+    const showSlotMenu = event => {
+      if (typeof props.options !== 'string') slotContextMenu.value = undefined;else {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        setLocation(event);
+        slotContextMenu.value = props.options;
       }
     };
 
     return {
-      contextMenu,
       visible: computed(() => props.active && visible.value),
       location: computed(() => ({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`
       })),
-      onClick: (event, mode, btn) => showContextMenu(event, mode, btn),
+      slotContextMenu,
+      contextMenu,
+      onClick: (event, mode, btn) => {
+        visible.value = false;
+        if (props.active === false) return;
+        if (typeof props.options === 'string') showSlotMenu(event);else showContextMenu(event, mode, btn);
+        visible.value = true;
+      },
 
       optionClicked(action) {
         hideContextMenu();
@@ -217,16 +237,7 @@ var script = /*#__PURE__*/defineComponent({
 
 });
 
-const _withId = /*#__PURE__*/withScopeId("data-v-616c0e36");
-
-pushScopeId("data-v-616c0e36");
-
-const _hoisted_1 = {
-  key: 0,
-  class: "context-menu__divider"
-};
-
-popScopeId();
+const _withId = /*#__PURE__*/withScopeId("data-v-20aeb5f8");
 
 const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $options) => {
   const _directive_click_outside = resolveDirective("click-outside");
@@ -242,18 +253,30 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
       'context-menu--active': _ctx.visible
     }],
     style: _ctx.location
-  }, [(openBlock(true), createBlock(Fragment, null, renderList(_ctx.contextMenu, ({
+  }, [_ctx.slotContextMenu ? renderSlot(_ctx.$slots, _ctx.slotContextMenu, {
+    key: 0
+  }) : (openBlock(true), createBlock(Fragment, {
+    key: 1
+  }, renderList(_ctx.contextMenu, ({
     type,
     name,
     label,
-    icon
+    icon,
+    class: className,
+    slot: slotName
   }, index) => {
     var _ref;
 
     return openBlock(), createBlock(Fragment, {
       key: index
-    }, [type === 'divider' ? (openBlock(), createBlock("li", _hoisted_1)) : (openBlock(), createBlock("li", {
+    }, [slotName ? renderSlot(_ctx.$slots, slotName, {
+      key: 0
+    }) : createCommentVNode("", true), type === 'divider' ? (openBlock(), createBlock("li", {
       key: 1,
+      class: ["context-menu__divider", className]
+    }, null, 2)) : (openBlock(), createBlock("li", {
+      key: 2,
+      class: className,
       onClick: withModifiers($event => _ctx.optionClicked(name !== null && name !== void 0 ? name : ''), ["stop"])
     }, [_ctx.iconFormat === 'class' ? (openBlock(), createBlock("i", {
       key: 0,
@@ -261,7 +284,7 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
     }, null, 2)) : (openBlock(), createBlock("i", {
       key: 1,
       class: _ctx.iconFormat
-    }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString((_ref = label !== null && label !== void 0 ? label : name) !== null && _ref !== void 0 ? _ref : ""), 1)], 8, ["onClick"]))], 64);
+    }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString((_ref = label !== null && label !== void 0 ? label : name) !== null && _ref !== void 0 ? _ref : ""), 1)], 10, ["onClick"]))], 64);
   }), 128))], 6), [[_directive_click_outside, _ctx.onClickOutsideConf]])], 64);
 });
 
@@ -292,11 +315,11 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = "\n.context-menu[data-v-616c0e36] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: none;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu.context-menu--active[data-v-616c0e36] {\n  display: block;\n}\n.context-menu > li[data-v-616c0e36] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-616c0e36]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-616c0e36] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-616c0e36]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-616c0e36]:last-of-type {\n  margin-bottom: 4px;\n}\n";
+var css_248z = "\n.context-menu[data-v-20aeb5f8] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: none;\n  list-style: none;\n  position: absolute;\n  z-index: 1000000;\n  background-color: var(--cm-light-grey);\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu.context-menu--active[data-v-20aeb5f8] {\n  display: block;\n}\n.context-menu > li[data-v-20aeb5f8] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu > li[data-v-20aeb5f8]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__divider[data-v-20aeb5f8] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu li[data-v-20aeb5f8]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu li[data-v-20aeb5f8]:last-of-type {\n  margin-bottom: 4px;\n}\n";
 styleInject(css_248z);
 
 script.render = render;
-script.__scopeId = "data-v-616c0e36";
+script.__scopeId = "data-v-20aeb5f8";
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
