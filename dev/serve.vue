@@ -1,11 +1,30 @@
 <template>
   <div id="app">
-    <button @click="append()">Add</button>
-    <context-menu delimiter="elements-wrapper" events="secondary" :options="menuOptions" @optionClick="onMenuClick">
-      <ul class="elements-wrapper">
-        <li v-for="{ key, value } in elements" :key="key" :id="key">{{ value }}</li>
-      </ul>
-    </context-menu>
+    <div>
+      <button @click="append()">Add</button>
+      <context-menu delimiter="elements-wrapper" events="secondary" :options="menuOptions" @optionClick="onMenuClick">
+        <ul class="elements-wrapper">
+          <li v-for="{ key, value } in elements" :key="key" :id="key">{{ value }}</li>
+        </ul>
+      </context-menu>
+    </div>
+    <div>
+      <button @click="append()">Add</button>
+      <context-menu delimiter="elements-wrapper" events="secondary" options="menu" @optionClick="onMenuClick">
+        <template v-slot:menu="{ onClick }">
+          <ul class="own-menu">
+            <li @click="onClick('move_up')">Subir</li>
+            <li @click="onClick('move_down')">Bajar</li>
+            <li @click="onClick('duplicate')">Duplicar</li>
+            <li @click="onClick('delete')">Eliminar</li>
+          </ul>
+        </template>
+
+        <ul class="elements-wrapper">
+          <li v-for="{ key, value } in elements" :key="key" :id="key">{{ value }}</li>
+        </ul>
+      </context-menu>
+    </div>
   </div>
 </template>
 
@@ -17,6 +36,10 @@
 }
 #app {
   width: 100vw;
+  display: flex;
+  justify-content: space-evenly;
+}
+#app > div {
   min-height: 100vh;
   margin-top: 32px;
   text-align: center;
@@ -42,6 +65,24 @@ ul.elements-wrapper li {
 ul.elements-wrapper li:hover {
   background-color: bisque;
   transform: scale(1.1);
+}
+
+/* Own Menu */
+.own-menu {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bolder;
+  color: white;
+  background-color: black;
+  border-radius: 4px;
+}
+
+.own-menu > li {
+  padding: 10px 24px;
+}
+.own-menu > li:hover {
 }
 </style>
 

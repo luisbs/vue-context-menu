@@ -13,10 +13,10 @@
     <slot />
   </div>
 
-  <template v-if="visible">
+  <div v-if="visible" class="context-menu" :style="location" v-click-outside="onClickOutsideConf">
     <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
 
-    <ul class="context-menu" :style="location" v-click-outside="onClickOutsideConf">
+    <ul v-else class="context-menu__options">
       <template v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
         <slot v-if="slotName" :name="slotName" :onClick="optionClicked" />
 
@@ -29,7 +29,7 @@
         </li>
       </template>
     </ul>
-  </template>
+  </div>
 </template>
 
 <style scoped>
@@ -47,27 +47,8 @@
   margin: 0;
   padding: 0;
   display: block;
-  list-style: none;
   position: absolute;
   z-index: 1000000;
-  background-color: var(--cm-light-grey);
-  border-bottom-width: 0px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);
-  border-radius: 4px;
-}
-
-.context-menu > li {
-  display: flex;
-  align-items: center;
-  padding: 5px 15px;
-  color: var(--cm-black);
-  cursor: pointer;
-}
-.context-menu > li:hover {
-  background-color: var(--cm-blue);
-  color: var(--cm-white);
 }
 
 .context-menu .context-menu__divider {
@@ -79,10 +60,33 @@
   pointer-events: none;
 }
 
-.context-menu li:first-of-type {
+.context-menu .context-menu__options {
+  display: block;
+  list-style: none;
+  border-bottom-width: 0px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  background-color: var(--cm-light-grey);
+  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);
+  border-radius: 4px;
+}
+
+.context-menu .context-menu__options > li {
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
+  color: var(--cm-black);
+  cursor: pointer;
+}
+.context-menu .context-menu__options > li:hover {
+  background-color: var(--cm-blue);
+  color: var(--cm-white);
+}
+
+.context-menu .context-menu__options li:first-of-type {
   margin-top: 4px;
 }
-.context-menu li:last-of-type {
+.context-menu .context-menu__options li:last-of-type {
   margin-bottom: 4px;
 }
 </style>
