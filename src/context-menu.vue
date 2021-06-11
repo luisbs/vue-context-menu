@@ -84,7 +84,7 @@
   background-color: var(--cm-background__hover);
 }
 
-.vue-context-menu .vue-context-menu__divider {
+.vue-context-menu li.vue-context-menu__divider {
   pointer-events: none;
   box-sizing: content-box;
   height: calc(var(--cm-gap) / 2);
