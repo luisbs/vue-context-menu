@@ -59,6 +59,8 @@
 
 .vue-context-menu__options {
   display: block;
+  padding-top: var(--cm-margin-y);
+  padding-bottom: var(--cm-margin-y);
   color: var(--cm-color);
   background-color: var(--cm-background);
   border-radius: var(--cm-radius);
@@ -74,19 +76,12 @@
   grid-template-columns: 20% 80%;
   padding: var(--cm-padding);
 }
+.vue-context-menu__options > li > * + * {
+  margin-left: var(--cm-gap);
+}
 .vue-context-menu__options > li:hover {
   color: var(--cm-color__hover);
   background-color: var(--cm-background__hover);
-}
-.vue-context-menu__options li:first-of-type {
-  margin-top: var(--cm-margin-y);
-}
-.vue-context-menu__options li:last-of-type {
-  margin-bottom: var(--cm-margin-y);
-}
-
-.vue-context-menu__options > li > * + * {
-  margin-left: var(--cm-gap);
 }
 
 .vue-context-menu .vue-context-menu__divider {

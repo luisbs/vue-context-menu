@@ -10,13 +10,14 @@ The following are the default css variables for the styles. To make little visua
 .vue-context-menu {
   --cm-margin-y: 4px;
   --cm-padding: 5px 15px;
+  --cm-gap: 4px;
   --cm-radius: 4px;
   --cm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
 
   --cm-color: #000;
   --cm-background: #ecf0f1;
-  --cm-border-color: #c0cdd1;
+  --cm-divider-color: #c0cdd1;
   --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
 
   --cm-color__hover: #fff;
