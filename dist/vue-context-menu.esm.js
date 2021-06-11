@@ -113,32 +113,53 @@ var script = /*#__PURE__*/defineComponent({
 
         return valid;
       });
-    }); // ? Mantener sincronizado el conjunto de posibles menus
+    });
+
+    const compileNameEvent = e => {
+      if (!e) return;
+      let btn = undefined;
+      if (/(main|left)/.test(e)) btn = "main";else if (/(sec|right)/.test(e)) btn = "secondary";else if (/(aux)/.test(e)) btn = "auxiliar";
+      if (!btn) return;
+      const event = /^dblclick/.test(e) ? "dblclick" : "click";
+      let mod = "_";
+      if (/ctrl\./.test(e)) mod = "_ctrl_";else if (/alt\./.test(e)) mod = "_alt_";else if (/shift\./.test(e)) mod = "_shift_";else if (/meta\./.test(e)) mod = "_meta_";
+      return `${event}${mod}${btn}`;
+    }; // ? Mantener sincronizado el conjunto de posibles menus
+
 
     const __menuOptionsMap = ref(new Map());
 
     watchEffect(() => {
       if (typeof props.options === 'string') return;
       __menuOptionsMap.value = new Map();
-      props.options.forEach(m => {
-        var _m$name;
+      props.options.forEach(opt => {
+        var _opt$name;
 
-        let name = (_m$name = m.name) !== null && _m$name !== void 0 ? _m$name : `no-name-${Math.random().toString().slice(2, 5)}`;
-        const events = Array.isArray(m.on) ? m.on : Array(m.on);
+        let name = (_opt$name = opt.name) !== null && _opt$name !== void 0 ? _opt$name : `no-name-${Math.random().toString().slice(2, 5)}`;
+
+        if (!opt.on) {
+          __events.value.forEach(e => {
+            var _menuOptionsMap$valu;
+
+            const menuName = compileNameEvent(e);
+            if (!menuName) return;
+            const menu = (_menuOptionsMap$valu = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu !== void 0 ? _menuOptionsMap$valu : [];
+
+            __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}),
+              name
+            }]);
+          });
+        }
+
+        const events = Array.isArray(opt.on) ? opt.on : Array(opt.on);
         events.forEach(e => {
-          var _menuOptionsMap$valu;
+          var _menuOptionsMap$valu2;
 
-          if (!e) return;
-          let btn = undefined;
-          if (/(main|left)/.test(e)) btn = "main";else if (/(sec|right)/.test(e)) btn = "secondary";else if (/(aux)/.test(e)) btn = "auxiliar";
-          if (!btn) return;
-          const ev = /^dblclick/.test(e) ? "dblclick" : "click";
-          let mod = "_";
-          if (/ctrl\./.test(e)) mod = "_ctrl_";else if (/alt\./.test(e)) mod = "_alt_";else if (/shift\./.test(e)) mod = "_shift_";else if (/meta\./.test(e)) mod = "_meta_";
-          const menuName = `${ev}${mod}${btn}`;
-          const menu = (_menuOptionsMap$valu = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu !== void 0 ? _menuOptionsMap$valu : [];
+          const menuName = compileNameEvent(e);
+          if (!menuName) return;
+          const menu = (_menuOptionsMap$valu2 = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu2 !== void 0 ? _menuOptionsMap$valu2 : [];
 
-          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof m === "object" ? m : {}),
+          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}),
             name
           }]);
         });
@@ -255,9 +276,9 @@ var script = /*#__PURE__*/defineComponent({
 
 });
 
-const _withId = /*#__PURE__*/withScopeId("data-v-479ea5a0");
+const _withId = /*#__PURE__*/withScopeId("data-v-6349d17d");
 
-pushScopeId("data-v-479ea5a0");
+pushScopeId("data-v-6349d17d");
 
 const _hoisted_1 = {
   key: 1,
@@ -342,11 +363,11 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = "\n.context-menu[data-v-479ea5a0] {\n  --cm-light-grey: #ecf0f1;\n  /* --cm-grey: darken(var(--cm-light-grey), 15%); */\n  --cm-grey: #c0cdd1;\n  --cm-blue: #007aff;\n  --cm-white: #fff;\n  --cm-black: #333;\n  --cm-black-shadow: rgba(51, 51, 51, 0.2);\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.context-menu .context-menu__divider[data-v-479ea5a0] {\n  box-sizing: content-box;\n  height: 2px;\n  background-color: var(--cm-grey);\n  padding: 4px 0;\n  background-clip: content-box;\n  pointer-events: none;\n}\n.context-menu .context-menu__options[data-v-479ea5a0] {\n  display: block;\n  list-style: none;\n  border-bottom-width: 0px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n  background-color: var(--cm-light-grey);\n  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);\n  border-radius: 4px;\n}\n.context-menu .context-menu__options > li[data-v-479ea5a0] {\n  display: flex;\n  align-items: center;\n  padding: 5px 15px;\n  color: var(--cm-black);\n  cursor: pointer;\n}\n.context-menu .context-menu__options > li[data-v-479ea5a0]:hover {\n  background-color: var(--cm-blue);\n  color: var(--cm-white);\n}\n.context-menu .context-menu__options li[data-v-479ea5a0]:first-of-type {\n  margin-top: 4px;\n}\n.context-menu .context-menu__options li[data-v-479ea5a0]:last-of-type {\n  margin-bottom: 4px;\n}\n";
+var css_248z = "\n.vue-context-menu[data-v-6349d17d] {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider[data-v-6349d17d] {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options[data-v-6349d17d] {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d] {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d]:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
 styleInject(css_248z);
 
 script.render = render;
-script.__scopeId = "data-v-479ea5a0";
+script.__scopeId = "data-v-6349d17d";
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component

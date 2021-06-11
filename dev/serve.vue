@@ -88,7 +88,7 @@ ul.elements-wrapper li:hover {
 
 <script lang="ts">
 import { defineComponent, ref } from "vue"
-import { ContextualMenuOption, ContextualMenuEvent } from "context-menu"
+import { ContextualMenuOption, ContextualMenuEvent } from "vue-context-menu"
 
 function unique() {
   return Math.random()

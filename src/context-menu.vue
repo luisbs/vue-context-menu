@@ -32,15 +32,20 @@
   </div>
 </template>
 
-<style scoped>
-.context-menu {
-  --cm-light-grey: #ecf0f1;
-  /* --cm-grey: darken(var(--cm-light-grey), 15%); */
-  --cm-grey: #c0cdd1;
-  --cm-blue: #007aff;
-  --cm-white: #fff;
-  --cm-black: #333;
-  --cm-black-shadow: rgba(51, 51, 51, 0.2);
+<style>
+.vue-context-menu {
+  --cm-margin-y: 4px;
+  --cm-padding: 5px 15px;
+  --cm-radius: 4px;
+  --cm-color: #000;
+  --cm-background: #ecf0f1;
+  --cm-border-color: #c0cdd1;
+  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
+  --cm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+
+  --cm-color__hover: #fff;
+  --cm-background__hover: #ea1e63;
 
   top: 0;
   left: 0;
@@ -51,49 +56,46 @@
   z-index: 1000000;
 }
 
-.context-menu .context-menu__divider {
+.vue-context-menu .vue-context-menu__divider {
+  pointer-events: none;
   box-sizing: content-box;
   height: 2px;
-  background-color: var(--cm-grey);
   padding: 4px 0;
+  background-color: var(--cm-border-color);
   background-clip: content-box;
-  pointer-events: none;
 }
 
-.context-menu .context-menu__options {
+.vue-context-menu .vue-context-menu__options {
   display: block;
+  color: var(--cm-color);
+  background-color: var(--cm-background);
+  border-radius: var(--cm-radius);
+  box-shadow: var(--cm-shadow);
+  font-family: var(--cm-font);
   list-style: none;
-  border-bottom-width: 0px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-  background-color: var(--cm-light-grey);
-  box-shadow: 0 3px 6px 0 var(--cm-black-shadow);
-  border-radius: 4px;
 }
 
-.context-menu .context-menu__options > li {
-  display: flex;
-  align-items: center;
-  padding: 5px 15px;
-  color: var(--cm-black);
+.vue-context-menu .vue-context-menu__options > li {
   cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: var(--cm-padding);
 }
-.context-menu .context-menu__options > li:hover {
-  background-color: var(--cm-blue);
-  color: var(--cm-white);
+.vue-context-menu .vue-context-menu__options > li:hover {
+  color: var(--cm-color__hover);
+  background-color: var(--cm-background__hover);
 }
-
-.context-menu .context-menu__options li:first-of-type {
-  margin-top: 4px;
+.vue-context-menu .vue-context-menu__options li:first-of-type {
+  margin-top: var(--cm-margin-y);
 }
-.context-menu .context-menu__options li:last-of-type {
-  margin-bottom: 4px;
+.vue-context-menu .vue-context-menu__options li:last-of-type {
+  margin-bottom: var(--cm-margin-y);
 }
 </style>
 
 <script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watchEffect } from "vue"
-import type { ContextualMenuOption, MenuOptionName, MenuOptions, MouseClick, MouseEvents, MouseOptionButtons } from "../context-menu"
+import type { ContextualMenuOption, MenuOptionName, MenuOptions, MouseClick, MouseEvents, MouseOptionButtons } from "../vue-context-menu"
 
 function isValidMouseEvent(str: string): str is MouseEvents {
   return (
@@ -172,36 +174,52 @@ export default /*#__PURE__*/ defineComponent({
       })
     })
 
+    const compileNameEvent = (e?:string) => {
+      if (!e) return
+
+      let btn: string | undefined = undefined
+      if (/(main|left)/.test(e)) btn = "main"
+      else if (/(sec|right)/.test(e)) btn = "secondary"
+      else if (/(aux)/.test(e)) btn = "auxiliar"
+
+      if (!btn) return
+
+      const event = /^dblclick/.test(e) ? "dblclick" : "click"
+      let mod = "_"
+      if (/ctrl\./.test(e)) mod = "_ctrl_"
+      else if (/alt\./.test(e)) mod = "_alt_"
+      else if (/shift\./.test(e)) mod = "_shift_"
+      else if (/meta\./.test(e)) mod = "_meta_"
+
+      return `${event}${mod}${btn}` as MenuOptionName
+    }
+
     // ? Mantener sincronizado el conjunto de posibles menus
     const __menuOptionsMap = ref<MenuOptions>(new Map())
     watchEffect(() => {
       if (typeof props.options === 'string') return
 
       __menuOptionsMap.value = new Map()
-      ;(props.options as ContextualMenuOption[]).forEach(m => {
-        let name = m.name ?? `no-name-${Math.random().toString().slice(2, 5)}`
+      ;(props.options as ContextualMenuOption[]).forEach(opt => {
+        let name = opt.name ?? `no-name-${Math.random().toString().slice(2, 5)}`
 
-        const events = Array.isArray(m.on) ? m.on : Array(m.on)
+        if (!opt.on) {
+          __events.value.forEach((e) => {
+            const menuName = compileNameEvent(e)
+            if (!menuName) return
+
+            const menu = __menuOptionsMap.value.get(menuName) ?? []
+            __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}), name }])
+          })
+        }
+
+        const events = Array.isArray(opt.on) ? opt.on : Array(opt.on)
         events.forEach(e => {
-          if (!e) return
+          const menuName = compileNameEvent(e)
+            if (!menuName) return
 
-          let btn: string | undefined = undefined
-          if (/(main|left)/.test(e)) btn = "main"
-          else if (/(sec|right)/.test(e)) btn = "secondary"
-          else if (/(aux)/.test(e)) btn = "auxiliar"
-
-          if (!btn) return
-
-          const ev = /^dblclick/.test(e) ? "dblclick" : "click"
-          let mod = "_"
-          if (/ctrl\./.test(e)) mod = "_ctrl_"
-          else if (/alt\./.test(e)) mod = "_alt_"
-          else if (/shift\./.test(e)) mod = "_shift_"
-          else if (/meta\./.test(e)) mod = "_meta_"
-
-          const menuName = `${ev}${mod}${btn}` as MenuOptionName
           const menu = __menuOptionsMap.value.get(menuName) ?? []
-          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof m === "object" ? m : {}), name }])
+          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}), name }])
         })
       })
     })

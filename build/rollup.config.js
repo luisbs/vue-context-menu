@@ -25,6 +25,9 @@ const argv = minimist(process.argv.slice(2))
 
 const projectRoot = path.resolve(__dirname, "..")
 
+// Common part of the name for the files
+const fileName = "dist/vue-context-menu"
+
 const baseConfig = {
   input: "src/entry.ts",
   plugins: {
@@ -90,7 +93,7 @@ if (!argv.format || argv.format === "es") {
     input: "src/entry.esm.ts",
     external,
     output: {
-      file: "dist/context-menu.esm.js",
+      file: `${fileName}.esm.js`,
       format: "esm",
       exports: "named",
     },
@@ -122,7 +125,7 @@ if (!argv.format || argv.format === "cjs") {
     external,
     output: {
       compact: true,
-      file: "dist/context-menu.ssr.js",
+      file: `${fileName}.ssr.js`,
       format: "cjs",
       name: "ContextMenu",
       exports: "auto",
@@ -145,7 +148,7 @@ if (!argv.format || argv.format === "iife") {
     external,
     output: {
       compact: true,
-      file: "dist/context-menu.min.js",
+      file: `${fileName}.min.js`,
       format: "iife",
       name: "ContextMenu",
       exports: "auto",
