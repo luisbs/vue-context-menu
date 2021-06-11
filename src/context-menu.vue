@@ -17,10 +17,10 @@
     <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
 
     <ul v-else class="context-menu__options">
-      <template v-for="({ type, name, label, icon, class: className, slot: slotName }, index) in contextMenu" :key="index">
-        <slot v-if="slotName" :name="slotName" :onClick="optionClicked" />
+      <template v-for="({ use, isDivider, name, label, icon, class: className }, index) in contextMenu" :key="index">
+        <slot v-if="use" :name="use" :onClick="optionClicked" />
 
-        <li v-if="type === 'divider'" class="context-menu__divider" :class="className" />
+        <li v-else-if="isDivider" class="context-menu__divider" :class="className" />
 
         <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
           <i v-if="iconFormat === 'class'" :class="icon" />

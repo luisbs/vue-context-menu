@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, pushScopeId, popScopeId, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, createCommentVNode, toDisplayString, withScopeId } from 'vue';
+import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, toDisplayString, createCommentVNode } from 'vue';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -276,18 +276,11 @@ var script = /*#__PURE__*/defineComponent({
 
 });
 
-const _withId = /*#__PURE__*/withScopeId("data-v-6349d17d");
-
-pushScopeId("data-v-6349d17d");
-
 const _hoisted_1 = {
   key: 1,
   class: "context-menu__options"
 };
-
-popScopeId();
-
-const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $options) => {
+function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_click_outside = resolveDirective("click-outside");
 
   return openBlock(), createBlock(Fragment, null, [createVNode("div", mergeProps(_ctx.$attrs, {
@@ -305,21 +298,21 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
     item: _ctx.selectedItem,
     onClick: _ctx.optionClicked
   }) : (openBlock(), createBlock("ul", _hoisted_1, [(openBlock(true), createBlock(Fragment, null, renderList(_ctx.contextMenu, ({
-    type,
+    use,
+    isDivider,
     name,
     label,
     icon,
-    class: className,
-    slot: slotName
+    class: className
   }, index) => {
     var _ref;
 
     return openBlock(), createBlock(Fragment, {
       key: index
-    }, [slotName ? renderSlot(_ctx.$slots, slotName, {
+    }, [use ? renderSlot(_ctx.$slots, use, {
       key: 0,
       onClick: _ctx.optionClicked
-    }) : createCommentVNode("", true), type === 'divider' ? (openBlock(), createBlock("li", {
+    }) : isDivider ? (openBlock(), createBlock("li", {
       key: 1,
       class: ["context-menu__divider", className]
     }, null, 2)) : (openBlock(), createBlock("li", {
@@ -334,7 +327,7 @@ const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $optio
       class: _ctx.iconFormat
     }, toDisplayString(icon), 3)), createVNode("span", null, toDisplayString((_ref = label !== null && label !== void 0 ? label : name) !== null && _ref !== void 0 ? _ref : ""), 1)], 10, ["onClick"]))], 64);
   }), 128))]))], 4)), [[_directive_click_outside, _ctx.onClickOutsideConf]]) : createCommentVNode("", true)], 64);
-});
+}
 
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
@@ -363,11 +356,10 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = "\n.vue-context-menu[data-v-6349d17d] {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider[data-v-6349d17d] {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options[data-v-6349d17d] {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d] {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d]:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
+var css_248z = "\n.vue-context-menu {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
 styleInject(css_248z);
 
 script.render = render;
-script.__scopeId = "data-v-6349d17d";
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component

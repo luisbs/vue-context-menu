@@ -2,7 +2,7 @@
 
 Support for contextual menus on vue
 
-# Style modification
+# Styles
 
 The following are the default css variables for the styles. To make little visual changes a recommed to reset this variables.
 

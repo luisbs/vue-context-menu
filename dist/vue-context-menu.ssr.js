@@ -489,18 +489,11 @@ var script = /*#__PURE__*/vue.defineComponent({
       })
     };
   }
-});var _withId = /*#__PURE__*/vue.withScopeId("data-v-6349d17d");
-
-vue.pushScopeId("data-v-6349d17d");
-
-var _hoisted_1 = {
+});var _hoisted_1 = {
   key: 1,
   class: "context-menu__options"
 };
-
-vue.popScopeId();
-
-var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data, $options) {
+function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_click_outside = vue.resolveDirective("click-outside");
 
   return vue.openBlock(), vue.createBlock(vue.Fragment, null, [vue.createVNode("div", vue.mergeProps(_ctx.$attrs, {
@@ -532,18 +525,18 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
   }) : (vue.openBlock(), vue.createBlock("ul", _hoisted_1, [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.contextMenu, function (_ref, index) {
     var _ref2;
 
-    var type = _ref.type,
+    var use = _ref.use,
+        isDivider = _ref.isDivider,
         name = _ref.name,
         label = _ref.label,
         icon = _ref.icon,
-        className = _ref.class,
-        slotName = _ref.slot;
+        className = _ref.class;
     return vue.openBlock(), vue.createBlock(vue.Fragment, {
       key: index
-    }, [slotName ? vue.renderSlot(_ctx.$slots, slotName, {
+    }, [use ? vue.renderSlot(_ctx.$slots, use, {
       key: 0,
       onClick: _ctx.optionClicked
-    }) : vue.createCommentVNode("", true), type === 'divider' ? (vue.openBlock(), vue.createBlock("li", {
+    }) : isDivider ? (vue.openBlock(), vue.createBlock("li", {
       key: 1,
       class: ["context-menu__divider", className]
     }, null, 2)) : (vue.openBlock(), vue.createBlock("li", {
@@ -560,7 +553,7 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
       class: _ctx.iconFormat
     }, vue.toDisplayString(icon), 3)), vue.createVNode("span", null, vue.toDisplayString((_ref2 = label !== null && label !== void 0 ? label : name) !== null && _ref2 !== void 0 ? _ref2 : ""), 1)], 10, ["onClick"]))], 64);
   }), 128))]))], 4)), [[_directive_click_outside, _ctx.onClickOutsideConf]]) : vue.createCommentVNode("", true)], 64);
-});function styleInject(css, ref) {
+}function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
 
@@ -585,9 +578,8 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
   } else {
     style.appendChild(document.createTextNode(css));
   }
-}var css_248z = "\n.vue-context-menu[data-v-6349d17d] {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider[data-v-6349d17d] {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options[data-v-6349d17d] {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d] {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li[data-v-6349d17d]:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li[data-v-6349d17d]:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
-styleInject(css_248z);script.render = render;
-script.__scopeId = "data-v-6349d17d";// Default export is installable instance of component.
+}var css_248z = "\n.vue-context-menu {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
+styleInject(css_248z);script.render = render;// Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
 // to be registered via Vue.use() as well as Vue.component(),
 var component = /*#__PURE__*/(function () {
