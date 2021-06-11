@@ -36,10 +36,11 @@
 .vue-context-menu {
   --cm-margin-y: 4px;
   --cm-padding: 5px 15px;
+  --cm-gap: 4px;
   --cm-radius: 4px;
   --cm-color: #000;
   --cm-background: #ecf0f1;
-  --cm-border-color: #c0cdd1;
+  --cm-divider-color: #c0cdd1;
   --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
   --cm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
@@ -56,15 +57,6 @@
   z-index: 1000000;
 }
 
-.vue-context-menu__divider {
-  pointer-events: none;
-  box-sizing: content-box;
-  height: 2px;
-  padding: 4px 0;
-  background-color: var(--cm-border-color);
-  background-clip: content-box;
-}
-
 .vue-context-menu__options {
   display: block;
   color: var(--cm-color);
@@ -78,7 +70,8 @@
 .vue-context-menu__options > li {
   cursor: pointer;
   display: grid;
-  place-items: center;
+  align-items: center;
+  grid-template-columns: 20% 80%;
   padding: var(--cm-padding);
 }
 .vue-context-menu__options > li:hover {
@@ -90,6 +83,19 @@
 }
 .vue-context-menu__options li:last-of-type {
   margin-bottom: var(--cm-margin-y);
+}
+
+.vue-context-menu__options > li > * + * {
+  margin-right: var(--cm-gap);
+}
+
+.vue-context-menu__divider {
+  pointer-events: none;
+  box-sizing: content-box;
+  height: 2px;
+  padding: 4px 0;
+  background-color: var(--cm-divider-color);
+  background-clip: content-box;
 }
 </style>
 
