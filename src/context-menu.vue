@@ -72,7 +72,6 @@
 .vue-context-menu .vue-context-menu__options > li {
   cursor: pointer;
   display: grid;
-  align-items: center;
   grid-template-columns: 20% 80%;
   padding: var(--cm-padding);
 }
