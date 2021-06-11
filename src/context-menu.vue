@@ -86,14 +86,14 @@
 }
 
 .vue-context-menu__options > li > * + * {
-  margin-right: var(--cm-gap);
+  margin-left: var(--cm-gap);
 }
 
-.vue-context-menu__divider {
+.vue-context-menu .vue-context-menu__divider {
   pointer-events: none;
   box-sizing: content-box;
-  height: 2px;
-  padding: 4px 0;
+  height: calc(var(--cm-gap) / 2);
+  padding: var(--cm-gap) 0;
   background-color: var(--cm-divider-color);
   background-clip: content-box;
 }
