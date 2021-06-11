@@ -57,7 +57,7 @@
   z-index: 1000000;
 }
 
-.vue-context-menu__options {
+.vue-context-menu .vue-context-menu__options {
   display: block;
   padding-top: var(--cm-margin-y);
   padding-bottom: var(--cm-margin-y);
@@ -69,17 +69,17 @@
   list-style: none;
 }
 
-.vue-context-menu__options > li {
+.vue-context-menu .vue-context-menu__options > li {
   cursor: pointer;
   display: grid;
   align-items: center;
   grid-template-columns: 20% 80%;
   padding: var(--cm-padding);
 }
-.vue-context-menu__options > li > * + * {
+.vue-context-menu .vue-context-menu__options > li > * + * {
   margin-left: var(--cm-gap);
 }
-.vue-context-menu__options > li:hover {
+.vue-context-menu .vue-context-menu__options > li:hover {
   color: var(--cm-color__hover);
   background-color: var(--cm-background__hover);
 }
