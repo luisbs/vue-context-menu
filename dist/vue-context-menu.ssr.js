@@ -243,7 +243,7 @@ var script = /*#__PURE__*/vue.defineComponent({
     /** Defines a custom class delimitir for complex layouts */
     delimiter: {
       type: String,
-      default: "context-menu__content"
+      default: "vue-context-menu__content"
     },
 
     /** Corrects offsetX when using `position: relative` on parent */
@@ -491,13 +491,13 @@ var script = /*#__PURE__*/vue.defineComponent({
   }
 });var _hoisted_1 = {
   key: 1,
-  class: "context-menu__options"
+  class: "vue-context-menu__options"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_click_outside = vue.resolveDirective("click-outside");
 
   return vue.openBlock(), vue.createBlock(vue.Fragment, null, [vue.createVNode("div", vue.mergeProps(_ctx.$attrs, {
-    class: "context-menu__content",
+    class: "vue-context-menu__content",
     onClick: _cache[1] || (_cache[1] = vue.withModifiers(function ($event) {
       return _ctx.onClick($event, 'click', 'main');
     }, ["left", "prevent", "stop"])),
@@ -516,7 +516,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, ["right", "prevent", "stop"]))]
   }), [vue.renderSlot(_ctx.$slots, "default")], 16), _ctx.visible ? vue.withDirectives((vue.openBlock(), vue.createBlock("div", {
     key: 0,
-    class: "context-menu",
+    class: "vue-context-menu",
     style: _ctx.location
   }, [_ctx.slotContextMenu ? vue.renderSlot(_ctx.$slots, _ctx.slotContextMenu, {
     key: 0,
@@ -538,7 +538,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: _ctx.optionClicked
     }) : isDivider ? (vue.openBlock(), vue.createBlock("li", {
       key: 1,
-      class: ["context-menu__divider", className]
+      class: ["vue-context-menu__divider", className]
     }, null, 2)) : (vue.openBlock(), vue.createBlock("li", {
       key: 2,
       class: className,
@@ -578,7 +578,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   } else {
     style.appendChild(document.createTextNode(css));
   }
-}var css_248z = "\n.vue-context-menu {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu .vue-context-menu__options {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu .vue-context-menu__options li:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu .vue-context-menu__options li:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
+}var css_248z = "\n.vue-context-menu {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-border-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: 2px;\n  padding: 4px 0;\n  background-color: var(--cm-border-color);\n  background-clip: content-box;\n}\n.vue-context-menu__options {\n  display: block;\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu__options > li {\n  cursor: pointer;\n  display: grid;\n  place-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu__options > li:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu__options li:first-of-type {\n  margin-top: var(--cm-margin-y);\n}\n.vue-context-menu__options li:last-of-type {\n  margin-bottom: var(--cm-margin-y);\n}\n";
 styleInject(css_248z);script.render = render;// Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
 // to be registered via Vue.use() as well as Vue.component(),

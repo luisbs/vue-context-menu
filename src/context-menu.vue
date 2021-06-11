@@ -2,7 +2,7 @@
   <!-- eslint-disable-next-line -->
   <div
     v-bind="$attrs"
-    class="context-menu__content"
+    class="vue-context-menu__content"
     @click.left.prevent.stop="onClick($event, 'click', 'main')"
     @click.middle.prevent.stop="onClick($event, 'click', 'auxiliar')"
     @click.right.prevent.stop="onClick($event, 'click', 'secondary')"
@@ -13,14 +13,14 @@
     <slot />
   </div>
 
-  <div v-if="visible" class="context-menu" :style="location" v-click-outside="onClickOutsideConf">
+  <div v-if="visible" class="vue-context-menu" :style="location" v-click-outside="onClickOutsideConf">
     <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
 
-    <ul v-else class="context-menu__options">
+    <ul v-else class="vue-context-menu__options">
       <template v-for="({ use, isDivider, name, label, icon, class: className }, index) in contextMenu" :key="index">
         <slot v-if="use" :name="use" :onClick="optionClicked" />
 
-        <li v-else-if="isDivider" class="context-menu__divider" :class="className" />
+        <li v-else-if="isDivider" class="vue-context-menu__divider" :class="className" />
 
         <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
           <i v-if="iconFormat === 'class'" :class="icon" />
@@ -56,7 +56,7 @@
   z-index: 1000000;
 }
 
-.vue-context-menu .vue-context-menu__divider {
+.vue-context-menu__divider {
   pointer-events: none;
   box-sizing: content-box;
   height: 2px;
@@ -65,7 +65,7 @@
   background-clip: content-box;
 }
 
-.vue-context-menu .vue-context-menu__options {
+.vue-context-menu__options {
   display: block;
   color: var(--cm-color);
   background-color: var(--cm-background);
@@ -75,20 +75,20 @@
   list-style: none;
 }
 
-.vue-context-menu .vue-context-menu__options > li {
+.vue-context-menu__options > li {
   cursor: pointer;
   display: grid;
   place-items: center;
   padding: var(--cm-padding);
 }
-.vue-context-menu .vue-context-menu__options > li:hover {
+.vue-context-menu__options > li:hover {
   color: var(--cm-color__hover);
   background-color: var(--cm-background__hover);
 }
-.vue-context-menu .vue-context-menu__options li:first-of-type {
+.vue-context-menu__options li:first-of-type {
   margin-top: var(--cm-margin-y);
 }
-.vue-context-menu .vue-context-menu__options li:last-of-type {
+.vue-context-menu__options li:last-of-type {
   margin-bottom: var(--cm-margin-y);
 }
 </style>
@@ -126,7 +126,7 @@ export default /*#__PURE__*/ defineComponent({
      */
     iconFormat: { type: String, default: "class" },
     /** Defines a custom class delimitir for complex layouts */
-    delimiter: { type: String, default: "context-menu__content" },
+    delimiter: { type: String, default: "vue-context-menu__content" },
     /** Corrects offsetX when using `position: relative` on parent */
     offsetX: { type: Number, default: 0 },
     /** Corrects offsetY when using `position: relative` on parent */
