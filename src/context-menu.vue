@@ -73,7 +73,11 @@
   cursor: pointer;
   display: grid;
   grid-template-columns: 20% 80%;
+  align-items: center;
   padding: var(--cm-padding);
+}
+.vue-context-menu .vue-context-menu__options > li > *:first-child {
+  justify-self: center;
 }
 .vue-context-menu .vue-context-menu__options > li > * + * {
   margin-left: var(--cm-gap);
