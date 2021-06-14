@@ -305,11 +305,7 @@ export default /*#__PURE__*/ defineComponent({
     }
 
     return {
-      visible: computed(() => {
-        console.log('contextVisible',props.active && visible.value);
-
-        return props.active && visible.value
-      }),
+      visible: computed(() => props.active && visible.value),
       location: computed(() => ({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`,
