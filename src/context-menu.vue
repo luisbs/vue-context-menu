@@ -284,6 +284,7 @@ export default /*#__PURE__*/ defineComponent({
 
         setLocation(event)
         contextMenu.value = menu
+        visible.value = true
       }
     }
 
@@ -300,10 +301,15 @@ export default /*#__PURE__*/ defineComponent({
 
       setLocation(event)
       slotContextMenu.value = props.options
+      visible.value = true
     }
 
     return {
-      visible: computed(() => props.active && visible.value),
+      visible: computed(() => {
+        console.log('contextVisible',props.active && visible.value);
+
+        return props.active && visible.value
+      }),
       location: computed(() => ({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`,
@@ -318,8 +324,6 @@ export default /*#__PURE__*/ defineComponent({
 
         if (typeof props.options === 'string') showSlotMenu(event)
         else showContextMenu(event, mode, btn)
-
-        visible.value = true
       },
 
       optionClicked(action: string) {

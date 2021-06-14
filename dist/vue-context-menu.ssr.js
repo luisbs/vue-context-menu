@@ -429,6 +429,7 @@ var script = /*#__PURE__*/vue.defineComponent({
         event.preventDefault();
         setLocation(event);
         contextMenu.value = menu;
+        visible.value = true;
       }
     };
 
@@ -446,10 +447,12 @@ var script = /*#__PURE__*/vue.defineComponent({
       event.preventDefault();
       setLocation(event);
       slotContextMenu.value = props.options;
+      visible.value = true;
     };
 
     return {
       visible: vue.computed(function () {
+        console.log('contextVisible', props.active && visible.value);
         return props.active && visible.value;
       }),
       location: vue.computed(function () {
@@ -469,7 +472,6 @@ var script = /*#__PURE__*/vue.defineComponent({
         visible.value = false;
         if (props.active === false) return;
         if (typeof props.options === 'string') showSlotMenu(event);else showContextMenu(event, mode, btn);
-        visible.value = true;
       },
       optionClicked: function optionClicked(action) {
         hideContextMenu();

@@ -219,6 +219,7 @@ var script = /*#__PURE__*/defineComponent({
         event.preventDefault();
         setLocation(event);
         contextMenu.value = menu;
+        visible.value = true;
       }
     };
 
@@ -236,10 +237,14 @@ var script = /*#__PURE__*/defineComponent({
       event.preventDefault();
       setLocation(event);
       slotContextMenu.value = props.options;
+      visible.value = true;
     };
 
     return {
-      visible: computed(() => props.active && visible.value),
+      visible: computed(() => {
+        console.log('contextVisible', props.active && visible.value);
+        return props.active && visible.value;
+      }),
       location: computed(() => ({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`
@@ -255,7 +260,6 @@ var script = /*#__PURE__*/defineComponent({
         visible.value = false;
         if (props.active === false) return;
         if (typeof props.options === 'string') showSlotMenu(event);else showContextMenu(event, mode, btn);
-        visible.value = true;
       },
 
       optionClicked(action) {
