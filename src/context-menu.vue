@@ -307,7 +307,7 @@ export default /*#__PURE__*/ defineComponent({
 }
 .vue-context-menu .vue-context-menu--icons {
   --cm_offset: 34px;
-  --cm_icon_padding: 0 0 0 8px;
+  --cm_inset: 8px;
 }
 
 .vue-context-menu .vue-context-menu__options {
@@ -343,7 +343,6 @@ export default /*#__PURE__*/ defineComponent({
 
 .vue-context-menu li .vue-context-menu__icon {
   position: absolute;
-  left: 0;
-  padding: var(--cm_icon_padding);
+  left: var(--cm_inset);
 }
 </style>
