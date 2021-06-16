@@ -13,7 +13,7 @@ var vClickOutside_umd = createCommonjsModule(function (module, exports) {
 });
 
 function isValidMouseEvent(str) {
-  return /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) || /^ctrl\.(aux|sec)$/.test(str) || /^(ctrl\.)?(main|auxiliar|secondary|left|right)$/.test(str) || /^(click|dblclick)((\.ctrl)?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str);
+  return /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) || /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) || /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|right)$/.test(str) || /^(click|dblclick)((\.(ctrl|alt|shift|meta))?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str);
 }
 
 var script = /*#__PURE__*/defineComponent({

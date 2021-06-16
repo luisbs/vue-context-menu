@@ -5,9 +5,9 @@ import type { ContextualMenuOption, MenuOptionName, MenuOptions, MouseClick, Mou
 function isValidMouseEvent(str: string): str is MouseEvents {
   return (
     /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) ||
-    /^ctrl\.(aux|sec)$/.test(str) ||
-    /^(ctrl\.)?(main|auxiliar|secondary|left|right)$/.test(str) ||
-    /^(click|dblclick)((\.ctrl)?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str)
+    /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) ||
+    /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|right)$/.test(str) ||
+    /^(click|dblclick)((\.(ctrl|alt|shift|meta))?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str)
   )
 }
 
