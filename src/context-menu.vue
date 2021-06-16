@@ -244,13 +244,14 @@ export default /*#__PURE__*/ defineComponent({
   <div
     v-bind="$attrs"
     class="vue-context-menu__content"
-    @click.left.prevent.stop="onClick($event, 'click', 'main')"
-    @click.middle.prevent.stop="onClick($event, 'click', 'auxiliar')"
-    @click.right.prevent.stop="onClick($event, 'click', 'secondary')"
-    @dblclick.left.prevent.stop="onClick($event, 'dblclick', 'main')"
-    @dblclick.middle.prevent.stop="onClick($event, 'dblclick', 'auxiliar')"
-    @dblclick.right.prevent.stop="onClick($event, 'dblclick', 'secondary')"
+    @click.left.stop.prevent="onClick($event, 'click', 'main')"
+    @click.middle.stop.prevent="onClick($event, 'click', 'auxiliar')"
+    @dblclick.left.stop.prevent="onClick($event, 'dblclick', 'main')"
+    @dblclick.middle.stop.prevent="onClick($event, 'dblclick', 'auxiliar')"
+    @contextmenu.stop.prevent="onClick($event, 'click', 'secondary')"
   >
+    <!-- @click.right.stop.prevent="onClick($event, 'click', 'secondary')"
+    @dblclick.right.stop.prevent="onClick($event, 'dblclick', 'secondary')" -->
     <slot />
   </div>
 
@@ -284,7 +285,7 @@ export default /*#__PURE__*/ defineComponent({
   --cm_radius: 4px;
   --cm_color: #000;
   --cm_background: #ecf0f1;
-  --cm_divider-color: #c0cdd1;
+  --cm_divider_color: #c0cdd1;
   --cm_shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
   --cm_font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
@@ -301,7 +302,8 @@ export default /*#__PURE__*/ defineComponent({
   z-index: 1000000;
 }
 .vue-context-menu .vue-context-menu--icons {
-  --cm_offset: 28px;
+  --cm_offset: 32px;
+  --cm_icon_padding: 0 0 0 4px;
 }
 
 .vue-context-menu .vue-context-menu__options {
@@ -326,17 +328,18 @@ export default /*#__PURE__*/ defineComponent({
   background-color: var(--cm_background--hover);
 }
 
-.vue-context-menu .vue-context-menu__icon {
-  position: absolute;
-  left: 0;
-}
-
-.vue-context-menu .vue-context-menu__divider {
+.vue-context-menu li.vue-context-menu__divider {
   pointer-events: none;
   box-sizing: content-box;
   height: calc(var(--cm_gap) / 2);
   padding: var(--cm_gap) 0;
-  background-color: var(--cm_divider-color);
+  background-color: var(--cm_divider_color);
   background-clip: content-box;
+}
+
+.vue-context-menu li .vue-context-menu__icon {
+  position: absolute;
+  left: 0;
+  padding: var(--cm_icon_padding);
 }
 </style>
