@@ -217,6 +217,8 @@ export default /*#__PURE__*/ defineComponent({
       slotContextMenu,
       selectedItem: computed(() => selectedItem.value ?? ""),
       onClick: (event: MouseEvent, mode: MouseClick, btn: MouseOptionButtons) => {
+        console.log(`Executing contextMenu '${mode}:${btn}'`, event);
+
         visible.value = false
         if (props.active === false) return
 
@@ -278,20 +280,22 @@ export default /*#__PURE__*/ defineComponent({
 
 <style>
 .vue-context-menu {
-  --cm_margin: 4px 8px;
-  --cm_padding: 5px 8px;
-  --cm_offset: 8px;
+  --cm_margin: 4px 0;
+  --cm_padding: 5px 24px;
+  --cm_offset: 16px;
   --cm_gap: 4px;
   --cm_radius: 4px;
   --cm_color: #000;
   --cm_background: #ecf0f1;
-  --cm_divider_color: #c0cdd1;
   --cm_shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
   --cm_font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
 
   --cm_color--hover: #fff;
   --cm_background--hover: #ea1e63;
+
+  --cm_divider_padding: 8px;
+  --cm_divider_color: #c0cdd1;
 
   top: 0;
   left: 0;
@@ -302,8 +306,8 @@ export default /*#__PURE__*/ defineComponent({
   z-index: 1000000;
 }
 .vue-context-menu .vue-context-menu--icons {
-  --cm_offset: 32px;
-  --cm_icon_padding: 0 0 0 4px;
+  --cm_offset: 34px;
+  --cm_icon_padding: 0 0 0 8px;
 }
 
 .vue-context-menu .vue-context-menu__options {
@@ -332,7 +336,7 @@ export default /*#__PURE__*/ defineComponent({
   pointer-events: none;
   box-sizing: content-box;
   height: calc(var(--cm_gap) / 2);
-  padding: var(--cm_gap) 0;
+  padding: var(--cm_divider_padding);
   background-color: var(--cm_divider_color);
   background-clip: content-box;
 }
