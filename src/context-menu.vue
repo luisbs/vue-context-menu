@@ -1,102 +1,3 @@
-<template>
-  <!-- eslint-disable-next-line -->
-  <div
-    v-bind="$attrs"
-    class="vue-context-menu__content"
-    @click.left.prevent.stop="onClick($event, 'click', 'main')"
-    @click.middle.prevent.stop="onClick($event, 'click', 'auxiliar')"
-    @click.right.prevent.stop="onClick($event, 'click', 'secondary')"
-    @dblclick.left.prevent.stop="onClick($event, 'dblclick', 'main')"
-    @dblclick.middle.prevent.stop="onClick($event, 'dblclick', 'auxiliar')"
-    @dblclick.right.prevent.stop="onClick($event, 'dblclick', 'secondary')"
-  >
-    <slot />
-  </div>
-
-  <div v-if="visible" class="vue-context-menu" :style="location" v-click-outside="onClickOutsideConf">
-    <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
-
-    <ul v-else class="vue-context-menu__options">
-      <template v-for="({ use, isDivider, name, label, icon, class: className }, index) in contextMenu" :key="index">
-        <slot v-if="use" :name="use" :onClick="optionClicked" />
-
-        <li v-else-if="isDivider" class="vue-context-menu__divider" :class="className" />
-
-        <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
-          <i v-if="iconFormat === 'class'" :class="icon" />
-          <i v-else :class="iconFormat">{{ icon }}</i>
-          <span>{{ label ?? name ?? "" }}</span>
-        </li>
-      </template>
-    </ul>
-  </div>
-</template>
-
-<style>
-.vue-context-menu {
-  --cm-margin-y: 4px;
-  --cm-padding: 5px 15px;
-  --cm-gap: 4px;
-  --cm-radius: 4px;
-  --cm-color: #000;
-  --cm-background: #ecf0f1;
-  --cm-divider-color: #c0cdd1;
-  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
-  --cm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-
-  --cm-color__hover: #fff;
-  --cm-background__hover: #ea1e63;
-
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-  display: block;
-  position: absolute;
-  z-index: 1000000;
-}
-
-.vue-context-menu .vue-context-menu__options {
-  display: block;
-  padding-top: var(--cm-margin-y);
-  padding-bottom: var(--cm-margin-y);
-  color: var(--cm-color);
-  background-color: var(--cm-background);
-  border-radius: var(--cm-radius);
-  box-shadow: var(--cm-shadow);
-  font-family: var(--cm-font);
-  list-style: none;
-}
-
-.vue-context-menu .vue-context-menu__options > li {
-  cursor: pointer;
-  display: grid;
-  grid-template-columns: 20% 80%;
-  align-items: center;
-  padding: var(--cm-padding);
-}
-.vue-context-menu .vue-context-menu__options > li > *:first-child {
-  justify-self: center;
-}
-.vue-context-menu .vue-context-menu__options > li > * + * {
-  margin-left: var(--cm-gap);
-}
-.vue-context-menu .vue-context-menu__options > li:hover {
-  color: var(--cm-color__hover);
-  background-color: var(--cm-background__hover);
-}
-
-.vue-context-menu li.vue-context-menu__divider {
-  pointer-events: none;
-  box-sizing: content-box;
-  height: calc(var(--cm-gap) / 2);
-  padding: var(--cm-gap) 0;
-  background-color: var(--cm-divider-color);
-  background-clip: content-box;
-}
-</style>
-
 <script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watchEffect } from "vue"
 import type { ContextualMenuOption, MenuOptionName, MenuOptions, MouseClick, MouseEvents, MouseOptionButtons } from "../vue-context-menu"
@@ -123,12 +24,13 @@ export default /*#__PURE__*/ defineComponent({
     /** Defines when the context menu is active */
     active: { type: Boolean, default: true },
     /**
-     * Defines the icon format used in the contextual menu. (Default: `class`)
+     * Defines the icon format used in the contextual menu.
      * - `class`: for font-awesome-like, e.g: `<i class="[icon]" />`
      * - other text: for material-icons-like, e.g: `<i class="[iconFormat]">[icon]</i>`
-     * @default "class"
      */
-    iconFormat: { type: String, default: "class" },
+    iconFormat: String ,
+    /** Defines a class for the contextual menu wrapper */
+    menuClass: String,
     /** Defines a custom class delimitir for complex layouts */
     delimiter: { type: String, default: "vue-context-menu__content" },
     /** Corrects offsetX when using `position: relative` on parent */
@@ -336,3 +238,105 @@ export default /*#__PURE__*/ defineComponent({
   },
 })
 </script>
+
+<template>
+  <!-- eslint-disable-next-line -->
+  <div
+    v-bind="$attrs"
+    class="vue-context-menu__content"
+    @click.left.prevent.stop="onClick($event, 'click', 'main')"
+    @click.middle.prevent.stop="onClick($event, 'click', 'auxiliar')"
+    @click.right.prevent.stop="onClick($event, 'click', 'secondary')"
+    @dblclick.left.prevent.stop="onClick($event, 'dblclick', 'main')"
+    @dblclick.middle.prevent.stop="onClick($event, 'dblclick', 'auxiliar')"
+    @dblclick.right.prevent.stop="onClick($event, 'dblclick', 'secondary')"
+  >
+    <slot />
+  </div>
+
+  <div v-if="visible" class="vue-context-menu" :style="location" v-click-outside="onClickOutsideConf">
+    <slot v-if="slotContextMenu" :name="slotContextMenu" :item="selectedItem" :onClick="optionClicked" />
+
+    <ul v-else class="vue-context-menu__options" :class="[{ 'vue-context-menu--icons': iconFormat }, menuClass]">
+      <template v-for="({ use, isDivider, name, label, icon, class: className }, index) in contextMenu" :key="index">
+        <slot v-if="use" :name="use" :onClick="optionClicked" />
+
+        <li v-else-if="isDivider" class="vue-context-menu__divider" :class="className" />
+
+        <li v-else :class="className" @click.stop="optionClicked(name ?? '')">
+          <template v-if="iconFormat && icon">
+            <i v-if="iconFormat === 'class'" class="vue-context-menu__icon" :class="icon" />
+            <i v-else class="vue-context-menu__icon" :class="iconFormat">{{ icon }}</i>
+          </template>
+          <span v-if="label ?? name">{{ label ?? name }}</span>
+        </li>
+      </template>
+    </ul>
+  </div>
+</template>
+
+<style>
+.vue-context-menu {
+  --cm_margin: 4px 8px;
+  --cm_padding: 5px 8px;
+  --cm_offset: 8px;
+  --cm_gap: 4px;
+  --cm_radius: 4px;
+  --cm_color: #000;
+  --cm_background: #ecf0f1;
+  --cm_divider-color: #c0cdd1;
+  --cm_shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);
+  --cm_font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+
+  --cm_color--hover: #fff;
+  --cm_background--hover: #ea1e63;
+
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  display: block;
+  position: absolute;
+  z-index: 1000000;
+}
+.vue-context-menu .vue-context-menu--icons {
+  --cm_offset: 28px;
+}
+
+.vue-context-menu .vue-context-menu__options {
+  display: block;
+  padding: var(--cm_margin);
+  color: var(--cm_color);
+  background-color: var(--cm_background);
+  border-radius: var(--cm_radius);
+  box-shadow: var(--cm_shadow);
+  font-family: var(--cm_font);
+  list-style: none;
+}
+
+.vue-context-menu .vue-context-menu__options > li {
+  cursor: pointer;
+  position: relative;
+  padding: var(--cm_padding);
+  padding-left: var(--cm_offset);
+}
+.vue-context-menu .vue-context-menu__options > li:hover {
+  color: var(--cm_color--hover);
+  background-color: var(--cm_background--hover);
+}
+
+.vue-context-menu .vue-context-menu__icon {
+  position: absolute;
+  left: 0;
+}
+
+.vue-context-menu .vue-context-menu__divider {
+  pointer-events: none;
+  box-sizing: content-box;
+  height: calc(var(--cm_gap) / 2);
+  padding: var(--cm_gap) 0;
+  background-color: var(--cm_divider-color);
+  background-clip: content-box;
+}
+</style>

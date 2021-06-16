@@ -230,15 +230,14 @@ var script = /*#__PURE__*/vue.defineComponent({
     },
 
     /**
-     * Defines the icon format used in the contextual menu. (Default: `class`)
+     * Defines the icon format used in the contextual menu.
      * - `class`: for font-awesome-like, e.g: `<i class="[icon]" />`
      * - other text: for material-icons-like, e.g: `<i class="[iconFormat]">[icon]</i>`
-     * @default "class"
      */
-    iconFormat: {
-      type: String,
-      default: "class"
-    },
+    iconFormat: String,
+
+    /** Defines a class for the contextual menu wrapper */
+    menuClass: String,
 
     /** Defines a custom class delimitir for complex layouts */
     delimiter: {
@@ -491,8 +490,7 @@ var script = /*#__PURE__*/vue.defineComponent({
     };
   }
 });var _hoisted_1 = {
-  key: 1,
-  class: "vue-context-menu__options"
+  key: 1
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_click_outside = vue.resolveDirective("click-outside");
@@ -523,9 +521,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     item: _ctx.selectedItem,
     onClick: _ctx.optionClicked
-  }) : (vue.openBlock(), vue.createBlock("ul", _hoisted_1, [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.contextMenu, function (_ref, index) {
-    var _ref2;
-
+  }) : (vue.openBlock(), vue.createBlock("ul", {
+    key: 1,
+    class: ["vue-context-menu__options", [{
+      'vue-context-menu--icons': _ctx.iconFormat
+    }, _ctx.menuClass]]
+  }, [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.contextMenu, function (_ref, index) {
     var use = _ref.use,
         isDivider = _ref.isDivider,
         name = _ref.name,
@@ -546,14 +547,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: vue.withModifiers(function ($event) {
         return _ctx.optionClicked(name !== null && name !== void 0 ? name : '');
       }, ["stop"])
+    }, [_ctx.iconFormat && icon ? (vue.openBlock(), vue.createBlock(vue.Fragment, {
+      key: 0
     }, [_ctx.iconFormat === 'class' ? (vue.openBlock(), vue.createBlock("i", {
       key: 0,
-      class: icon
+      class: ["vue-context-menu__icon", icon]
     }, null, 2)) : (vue.openBlock(), vue.createBlock("i", {
       key: 1,
-      class: _ctx.iconFormat
-    }, vue.toDisplayString(icon), 3)), vue.createVNode("span", null, vue.toDisplayString((_ref2 = label !== null && label !== void 0 ? label : name) !== null && _ref2 !== void 0 ? _ref2 : ""), 1)], 10, ["onClick"]))], 64);
-  }), 128))]))], 4)), [[_directive_click_outside, _ctx.onClickOutsideConf]]) : vue.createCommentVNode("", true)], 64);
+      class: ["vue-context-menu__icon", _ctx.iconFormat]
+    }, vue.toDisplayString(icon), 3))], 64)) : vue.createCommentVNode("", true), (label !== null && label !== void 0 ? label : name) ? (vue.openBlock(), vue.createBlock("span", _hoisted_1, vue.toDisplayString(label !== null && label !== void 0 ? label : name), 1)) : vue.createCommentVNode("", true)], 10, ["onClick"]))], 64);
+  }), 128))], 2))], 4)), [[_directive_click_outside, _ctx.onClickOutsideConf]]) : vue.createCommentVNode("", true)], 64);
 }function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
@@ -579,7 +582,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   } else {
     style.appendChild(document.createTextNode(css));
   }
-}var css_248z = "\n.vue-context-menu {\n  --cm-margin-y: 4px;\n  --cm-padding: 5px 15px;\n  --cm-gap: 4px;\n  --cm-radius: 4px;\n  --cm-color: #000;\n  --cm-background: #ecf0f1;\n  --cm-divider-color: #c0cdd1;\n  --cm-shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm-color__hover: #fff;\n  --cm-background__hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu__options {\n  display: block;\n  padding-top: var(--cm-margin-y);\n  padding-bottom: var(--cm-margin-y);\n  color: var(--cm-color);\n  background-color: var(--cm-background);\n  border-radius: var(--cm-radius);\n  box-shadow: var(--cm-shadow);\n  font-family: var(--cm-font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li {\n  cursor: pointer;\n  display: grid;\n  grid-template-columns: 20% 80%;\n  align-items: center;\n  padding: var(--cm-padding);\n}\n.vue-context-menu .vue-context-menu__options > li > *:first-child {\n  justify-self: center;\n}\n.vue-context-menu .vue-context-menu__options > li > * + * {\n  margin-left: var(--cm-gap);\n}\n.vue-context-menu .vue-context-menu__options > li:hover {\n  color: var(--cm-color__hover);\n  background-color: var(--cm-background__hover);\n}\n.vue-context-menu li.vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: calc(var(--cm-gap) / 2);\n  padding: var(--cm-gap) 0;\n  background-color: var(--cm-divider-color);\n  background-clip: content-box;\n}\n";
+}var css_248z = "\n.vue-context-menu {\n  --cm_margin: 4px 8px;\n  --cm_padding: 5px 8px;\n  --cm_offset: 8px;\n  --cm_gap: 4px;\n  --cm_radius: 4px;\n  --cm_color: #000;\n  --cm_background: #ecf0f1;\n  --cm_divider-color: #c0cdd1;\n  --cm_shadow: 0 3px 6px 0 rgba(51, 51, 51, 0.2);\n  --cm_font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\",\n    \"Helvetica Neue\", sans-serif;\n\n  --cm_color--hover: #fff;\n  --cm_background--hover: #ea1e63;\n\n  top: 0;\n  left: 0;\n  margin: 0;\n  padding: 0;\n  display: block;\n  position: absolute;\n  z-index: 1000000;\n}\n.vue-context-menu .vue-context-menu--icons {\n  --cm_offset: 28px;\n}\n.vue-context-menu .vue-context-menu__options {\n  display: block;\n  padding: var(--cm_margin);\n  color: var(--cm_color);\n  background-color: var(--cm_background);\n  border-radius: var(--cm_radius);\n  box-shadow: var(--cm_shadow);\n  font-family: var(--cm_font);\n  list-style: none;\n}\n.vue-context-menu .vue-context-menu__options > li {\n  cursor: pointer;\n  position: relative;\n  padding: var(--cm_padding);\n  padding-left: var(--cm_offset);\n}\n.vue-context-menu .vue-context-menu__options > li:hover {\n  color: var(--cm_color--hover);\n  background-color: var(--cm_background--hover);\n}\n.vue-context-menu .vue-context-menu__icon {\n  position: absolute;\n  left: 0;\n}\n.vue-context-menu .vue-context-menu__divider {\n  pointer-events: none;\n  box-sizing: content-box;\n  height: calc(var(--cm_gap) / 2);\n  padding: var(--cm_gap) 0;\n  background-color: var(--cm_divider-color);\n  background-clip: content-box;\n}\n";
 styleInject(css_248z);script.render = render;// Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
 // to be registered via Vue.use() as well as Vue.component(),
