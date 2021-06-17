@@ -202,7 +202,6 @@ var script = /*#__PURE__*/defineComponent({
       }
 
       contextMenu.value = __menuOptions.value.filter(option => matchEvent(event, option.metaData, mode, btn));
-      console.log(`showing menu`, [...contextMenu.value], [...__menuOptions.value]);
       if (contextMenu.value.length > 0) visible.value = true;
       return false;
     };
