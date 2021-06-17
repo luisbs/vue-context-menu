@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onBeforeUnmount, watchEffect, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, toDisplayString, createCommentVNode } from 'vue';
+import { defineComponent, ref, onMounted, onBeforeUnmount, computed, resolveDirective, openBlock, createBlock, Fragment, createVNode, mergeProps, withModifiers, renderSlot, withDirectives, renderList, toDisplayString, createCommentVNode } from 'vue';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -13,7 +13,43 @@ var vClickOutside_umd = createCommonjsModule(function (module, exports) {
 });
 
 function isValidMouseEvent(str) {
-  return /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) || /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) || /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|right)$/.test(str) || /^(click|dblclick)((\.(ctrl|alt|shift|meta))?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str);
+  return /^(click|dblclick|main|auxiliar|secondary|left|middle|right)$/.test(str) || /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) || /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|middle|right)$/.test(str) || /^(click|dblclick)(\.(ctrl|alt|shift|meta))?(\.(main|auxiliar|secondary|left|middle|right|aux|sec))?$/.test(str);
+}
+
+function getMetaData(e) {
+  const isDblClick = /^dblclick/.test(e);
+  return {
+    click: !isDblClick,
+    dblclick: isDblClick,
+    ctrl: /ctrl/.test(e),
+    meta: /meta/.test(e),
+    alt: /alt/.test(e),
+    shift: /shift/.test(e),
+    main: /(main|left)/.test(e),
+    auxiliar: !isDblClick && /(aux|middle)/.test(e),
+    secondary: !isDblClick && /(sec|right)/.test(e)
+  };
+}
+
+function compileEvents(eventsString, options) {
+  if (!options || typeof options === "string") return [];
+  const events = (eventsString !== null && eventsString !== void 0 ? eventsString : "").replaceAll(/\s/g, "").split(",").filter(name => isValidMouseEvent(name));
+  const menuOptions = [];
+
+  for (const opt of options) {
+    var _opt$name;
+
+    let name = (_opt$name = opt.name) !== null && _opt$name !== void 0 ? _opt$name : Math.random().toString().slice(2, 5);
+    const metaData = [];
+    (!opt.on ? events : Array.isArray(opt.on) ? opt.on : [opt.on]). //
+    forEach(event => metaData.push(getMetaData(event)));
+    menuOptions.push({ ...opt,
+      name,
+      metaData
+    });
+  }
+
+  return menuOptions;
 }
 
 var script = /*#__PURE__*/defineComponent({
@@ -66,18 +102,18 @@ var script = /*#__PURE__*/defineComponent({
 
     /**
      * Defines the events to catch as comma separated strings
-     * e.g: `click.secondary, dblclick.ctrl.right`
+     * e.g: `click.secondary, dblclick.ctrl.left`
      *
      * The `click` can be omited, but the `dblclick` is required to prevent misunderstandings
      * e.g: `main, dblclick.main`
      *
-     * The `left` and `right` are alias of `main` and `secondary` respectively.
-     * @see `ContextualMenuOption["on"]` type for the posible values.
+     * The `left`, `middle` and `right` are alias of `main`, `auxiliar` and `secondary` respectively.
+     * @see `MouseEvents` type for the posible values.
      */
     events: {
       type: String,
       default: "secondary",
-      validator: v => /(click|main|aux|sec|left|right)/.test(v)
+      validator: v => /(click|ctrl|meta|alt|shift|main|aux|sec|left|middle|right)/.test(v)
     }
   },
 
@@ -93,77 +129,12 @@ var script = /*#__PURE__*/defineComponent({
     };
 
     onMounted(() => document.body.addEventListener("keyup", onEscKeyRelease));
-    onBeforeUnmount(() => document.body.removeEventListener("keyup", onEscKeyRelease));
+    onBeforeUnmount(() => document.body.removeEventListener("keyup", onEscKeyRelease)); // ? Mantener sincronizado el conjunto de posibles menus
 
-    const __events = ref([]);
-
-    const __catchClick = ref(false);
-
-    const __catchDblClick = ref(false);
-
-    watchEffect(() => {
-      __catchClick.value = __catchDblClick.value = false;
-      __events.value = props.events.split(",").filter(e => {
-        const valid = isValidMouseEvent(e);
-
-        if (valid) {
-          if (/^dblclick/.test(e)) __catchDblClick.value = true;else __catchClick.value = true;
-        }
-
-        return valid;
-      });
-    });
-
-    const compileNameEvent = e => {
-      if (!e) return;
-      let btn = undefined;
-      if (/(main|left)/.test(e)) btn = "main";else if (/(sec|right)/.test(e)) btn = "secondary";else if (/(aux)/.test(e)) btn = "auxiliar";
-      if (!btn) return;
-      const event = /^dblclick/.test(e) ? "dblclick" : "click";
-      let mod = "_";
-      if (/ctrl\./.test(e)) mod = "_ctrl_";else if (/alt\./.test(e)) mod = "_alt_";else if (/shift\./.test(e)) mod = "_shift_";else if (/meta\./.test(e)) mod = "_meta_";
-      return `${event}${mod}${btn}`;
-    }; // ? Mantener sincronizado el conjunto de posibles menus
+    const __menuOptions = computed(() => Array.isArray(props.options) //
+    ? compileEvents(props.events, props.options) : []); // ? Stores mouse location
 
 
-    const __menuOptionsMap = ref(new Map());
-
-    watchEffect(() => {
-      if (typeof props.options === 'string') return;
-      __menuOptionsMap.value = new Map();
-      props.options.forEach(opt => {
-        var _opt$name;
-
-        let name = (_opt$name = opt.name) !== null && _opt$name !== void 0 ? _opt$name : `no-name-${Math.random().toString().slice(2, 5)}`;
-
-        if (!opt.on) {
-          __events.value.forEach(e => {
-            var _menuOptionsMap$valu;
-
-            const menuName = compileNameEvent(e);
-            if (!menuName) return;
-            const menu = (_menuOptionsMap$valu = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu !== void 0 ? _menuOptionsMap$valu : [];
-
-            __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}),
-              name
-            }]);
-          });
-        }
-
-        const events = Array.isArray(opt.on) ? opt.on : Array(opt.on);
-        events.forEach(e => {
-          var _menuOptionsMap$valu2;
-
-          const menuName = compileNameEvent(e);
-          if (!menuName) return;
-          const menu = (_menuOptionsMap$valu2 = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu2 !== void 0 ? _menuOptionsMap$valu2 : [];
-
-          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}),
-            name
-          }]);
-        });
-      });
-    });
     const location = ref({
       x: 0,
       y: 0
@@ -202,41 +173,39 @@ var script = /*#__PURE__*/defineComponent({
     }; // ? Actualizar el menu mostrado
 
 
+    const slotContextMenu = ref();
     const contextMenu = ref([]);
 
-    const showContextMenu = (event, ev, btn) => {
+    const onClick = (event, mode, btn) => {
+      visible.value = false;
+      if (props.active === false) return;
+      event.stopImmediatePropagation();
       const id = setSelectedItem(event);
       if (!id || id.length < 1) return;
-      let mod = "_";
-      if (event.ctrlKey) mod = "_ctrl_";else if (event.altKey) mod = "_alt_";else if (event.shiftKey) mod = "_shift_";else if (event.metaKey) mod = "_meta_";
-      const menuName = `${ev}${mod}${btn}`;
-
-      const menu = __menuOptionsMap.value.get(menuName);
-
-      if (!menu) contextMenu.value = [];else {
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        setLocation(event);
-        contextMenu.value = menu;
-        visible.value = true;
-      }
-    };
-
-    const slotContextMenu = ref();
-
-    const showSlotMenu = event => {
-      const id = setSelectedItem(event);
-
-      if (typeof props.options !== 'string' || !id || id.length < 1) {
-        slotContextMenu.value = undefined;
-        return;
-      }
-
-      event.stopImmediatePropagation();
       event.preventDefault();
-      setLocation(event);
-      slotContextMenu.value = props.options;
-      visible.value = true;
+      setLocation(event); // console.log(`Executing contextMenu '${mode}:${btn}'`, event)
+
+      if (typeof props.options === "string") {
+        slotContextMenu.value = props.options;
+        visible.value = true;
+        return false;
+      }
+
+      console.log("events", [...__menuOptions.value]);
+      contextMenu.value = __menuOptions.value.filter(option => {
+        if (mode === "dblclick") {
+          return option.metaData.some(data => !data.dblclick || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || event.button !== 0 ? false : true);
+        } // Single click
+
+
+        return option.metaData.some(data => // return option.metaData.some(data =>
+        !data.click || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || data.main && event.button !== 0 || // (data.auxiliar && event.button !== 1) ||
+        data.auxiliar && btn !== "auxiliar" || // (data.secondary && event.button !== 2) ||
+        data.secondary && btn !== "secondary" ? false : true);
+      });
+      console.log(`showing menu`, [...contextMenu.value], btn);
+      if (contextMenu.value.length > 0) visible.value = true;
+      return false;
     };
 
     return {
@@ -245,6 +214,7 @@ var script = /*#__PURE__*/defineComponent({
         left: `${location.value.x}px`,
         top: `${location.value.y}px`
       })),
+      onClick,
       contextMenu,
       slotContextMenu,
       selectedItem: computed(() => {
@@ -252,12 +222,6 @@ var script = /*#__PURE__*/defineComponent({
 
         return (_selectedItem$value = selectedItem.value) !== null && _selectedItem$value !== void 0 ? _selectedItem$value : "";
       }),
-      onClick: (event, mode, btn) => {
-        console.log(`Executing contextMenu '${mode}:${btn}'`, event);
-        visible.value = false;
-        if (props.active === false) return;
-        if (typeof props.options === 'string') showSlotMenu(event);else showContextMenu(event, mode, btn);
-      },
 
       optionClicked(action) {
         hideContextMenu();
@@ -285,10 +249,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return openBlock(), createBlock(Fragment, null, [createVNode("div", mergeProps(_ctx.$attrs, {
     class: "vue-context-menu__content",
-    onClick: _cache[1] || (_cache[1] = withModifiers($event => _ctx.onClick($event, 'click', 'main'), ["left", "stop", "prevent"])),
-    onMouseup: _cache[2] || (_cache[2] = withModifiers($event => _ctx.onClick($event, 'click', 'auxiliar'), ["middle", "stop", "prevent"])),
-    onDblclick: [_cache[3] || (_cache[3] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'main'), ["left", "stop", "prevent"])), _cache[4] || (_cache[4] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'auxiliar'), ["middle", "stop", "prevent"]))],
-    onContextmenu: _cache[5] || (_cache[5] = withModifiers($event => _ctx.onClick($event, 'click', 'secondary'), ["stop", "prevent"]))
+    onClick: _cache[1] || (_cache[1] = withModifiers($event => _ctx.onClick($event, 'click'), ["prevent", "stop"])),
+    onDblclick: _cache[2] || (_cache[2] = withModifiers($event => _ctx.onClick($event, 'dblclick', 'main'), ["prevent", "stop"])),
+    onMouseup: _cache[3] || (_cache[3] = withModifiers($event => _ctx.onClick($event, 'click', 'auxiliar'), ["middle", "prevent", "stop"])),
+    onContextmenu: _cache[4] || (_cache[4] = withModifiers($event => _ctx.onClick($event, 'click', 'secondary'), ["prevent", "stop"]))
   }), [renderSlot(_ctx.$slots, "default")], 16), _ctx.visible ? withDirectives((openBlock(), createBlock("div", {
     key: 0,
     class: "vue-context-menu",

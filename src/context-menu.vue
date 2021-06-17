@@ -1,15 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watchEffect } from "vue"
-import type { ContextualMenuOption, MenuOptionName, MenuOptions, MouseClick, MouseEvents, MouseOptionButtons } from "../vue-context-menu"
-
-function isValidMouseEvent(str: string): str is MouseEvents {
-  return (
-    /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) ||
-    /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) ||
-    /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|right)$/.test(str) ||
-    /^(click|dblclick)((\.(ctrl|alt|shift|meta))?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str)
-  )
-}
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
+import { ContextualMenuOption, MenuOptions, MouseClick } from "vue-context-menu"
+import { compileEvents } from "./functions"
 
 export default /*#__PURE__*/ defineComponent({
   name: "ContextMenu",
@@ -28,7 +20,7 @@ export default /*#__PURE__*/ defineComponent({
      * - `class`: for font-awesome-like, e.g: `<i class="[icon]" />`
      * - other text: for material-icons-like, e.g: `<i class="[iconFormat]">[icon]</i>`
      */
-    iconFormat: String ,
+    iconFormat: String,
     /** Defines a class for the contextual menu wrapper */
     menuClass: String,
     /** Defines a custom class delimitir for complex layouts */
@@ -39,18 +31,18 @@ export default /*#__PURE__*/ defineComponent({
     offsetY: { type: Number, default: 0 },
     /**
      * Defines the events to catch as comma separated strings
-     * e.g: `click.secondary, dblclick.ctrl.right`
+     * e.g: `click.secondary, dblclick.ctrl.left`
      *
      * The `click` can be omited, but the `dblclick` is required to prevent misunderstandings
      * e.g: `main, dblclick.main`
      *
-     * The `left` and `right` are alias of `main` and `secondary` respectively.
-     * @see `ContextualMenuOption["on"]` type for the posible values.
+     * The `left`, `middle` and `right` are alias of `main`, `auxiliar` and `secondary` respectively.
+     * @see `MouseEvents` type for the posible values.
      */
     events: {
       type: String,
       default: "secondary",
-      validator: (v: string) => /(click|main|aux|sec|left|right)/.test(v),
+      validator: (v: string) => /(click|ctrl|meta|alt|shift|main|aux|sec|left|middle|right)/.test(v),
     },
   },
   setup(props, { emit }) {
@@ -64,78 +56,20 @@ export default /*#__PURE__*/ defineComponent({
     onMounted(() => document.body.addEventListener("keyup", onEscKeyRelease))
     onBeforeUnmount(() => document.body.removeEventListener("keyup", onEscKeyRelease))
 
-    const __events = ref<MouseEvents[]>([])
-    const __catchClick = ref(false)
-    const __catchDblClick = ref(false)
-    watchEffect(() => {
-      __catchClick.value = __catchDblClick.value = false
-
-      __events.value = (props.events.split(",") as MouseEvents[]).filter(e => {
-        const valid = isValidMouseEvent(e)
-        if (valid) {
-          if (/^dblclick/.test(e)) __catchDblClick.value = true
-          else __catchClick.value = true
-        }
-        return valid
-      })
-    })
-
-    const compileNameEvent = (e?:string) => {
-      if (!e) return
-
-      let btn: string | undefined = undefined
-      if (/(main|left)/.test(e)) btn = "main"
-      else if (/(sec|right)/.test(e)) btn = "secondary"
-      else if (/(aux)/.test(e)) btn = "auxiliar"
-
-      if (!btn) return
-
-      const event = /^dblclick/.test(e) ? "dblclick" : "click"
-      let mod = "_"
-      if (/ctrl\./.test(e)) mod = "_ctrl_"
-      else if (/alt\./.test(e)) mod = "_alt_"
-      else if (/shift\./.test(e)) mod = "_shift_"
-      else if (/meta\./.test(e)) mod = "_meta_"
-
-      return `${event}${mod}${btn}` as MenuOptionName
-    }
-
     // ? Mantener sincronizado el conjunto de posibles menus
-    const __menuOptionsMap = ref<MenuOptions>(new Map())
-    watchEffect(() => {
-      if (typeof props.options === 'string') return
+    const __menuOptions = computed<MenuOptions>(() =>
+      Array.isArray(props.options) //
+        ? compileEvents(props.events, props.options as ContextualMenuOption[])
+        : []
+    )
 
-      __menuOptionsMap.value = new Map()
-      ;(props.options as ContextualMenuOption[]).forEach(opt => {
-        let name = opt.name ?? `no-name-${Math.random().toString().slice(2, 5)}`
-
-        if (!opt.on) {
-          __events.value.forEach((e) => {
-            const menuName = compileNameEvent(e)
-            if (!menuName) return
-
-            const menu = __menuOptionsMap.value.get(menuName) ?? []
-            __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}), name }])
-          })
-        }
-
-        const events = Array.isArray(opt.on) ? opt.on : Array(opt.on)
-        events.forEach(e => {
-          const menuName = compileNameEvent(e)
-            if (!menuName) return
-
-          const menu = __menuOptionsMap.value.get(menuName) ?? []
-          __menuOptionsMap.value.set(menuName, [...menu, { ...(typeof opt === "object" ? opt : {}), name }])
-        })
-      })
-    })
-
+    // ? Stores mouse location
     const location = ref<Record<"x" | "y", number>>({ x: 0, y: 0 })
     const setLocation = (event: MouseEvent) => {
-        location.value = {
-          x: event.pageX - props.offsetX,
-          y: event.pageY - props.offsetY,
-        }
+      location.value = {
+        x: event.pageX - props.offsetX,
+        y: event.pageY - props.offsetY,
+      }
     }
 
     // ? Controls wich element has been clicked
@@ -155,55 +89,71 @@ export default /*#__PURE__*/ defineComponent({
           // ? Store child id
           else id = el.id
         }
-
       } catch (error) {
-        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`);
+        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`)
       }
       selectedItem.value = undefined
       return undefined
     }
 
-
     // ? Actualizar el menu mostrado
+    const slotContextMenu = ref<string>()
     const contextMenu = ref<ContextualMenuOption[]>([])
-    const showContextMenu = (event: MouseEvent, ev: MouseClick, btn: MouseOptionButtons) => {
+    const onClick = (event: MouseEvent, mode: MouseClick, btn?: string) => {
+      visible.value = false
+      if (props.active === false) return
+      event.stopImmediatePropagation()
+
       const id = setSelectedItem(event)
       if (!id || id.length < 1) return
 
-      let mod = "_"
-      if (event.ctrlKey) mod = "_ctrl_"
-      else if (event.altKey) mod = "_alt_"
-      else if (event.shiftKey) mod = "_shift_"
-      else if (event.metaKey) mod = "_meta_"
-
-      const menuName = `${ev}${mod}${btn}` as MenuOptionName
-      const menu = __menuOptionsMap.value.get(menuName)
-
-      if (!menu) contextMenu.value = []
-      else {
-        event.stopImmediatePropagation()
-        event.preventDefault()
-
-        setLocation(event)
-        contextMenu.value = menu
-        visible.value = true
-      }
-    }
-
-    const slotContextMenu = ref<string>()
-    const showSlotMenu = (event: MouseEvents) => {
-      const id = setSelectedItem(event)
-      if (typeof props.options !== 'string' || !id || id.length < 1) {
-        slotContextMenu.value = undefined
-        return
-      }
-
-      event.stopImmediatePropagation()
       event.preventDefault()
-
       setLocation(event)
-      slotContextMenu.value = props.options
-      visible.value = true
+
+      // console.log(`Executing contextMenu '${mode}:${btn}'`, event)
+      if (typeof props.options === "string") {
+        slotContextMenu.value = props.options
+        visible.value = true
+        return false
+      }
+      console.log("events", [...__menuOptions.value])
+
+      contextMenu.value = __menuOptions.value.filter(option => {
+        if (mode === "dblclick") {
+          return option.metaData.some(data =>
+            !data.dblclick ||
+            (data.ctrl && !event.ctrlKey) ||
+            (data.meta && !event.metaKey) ||
+            (data.alt && !event.altKey) ||
+            (data.shift && !event.shiftKey) ||
+            event.button !== 0
+              ? false
+              : true
+          )
+        }
+
+        // Single click
+        return option.metaData.some(data =>
+          // return option.metaData.some(data =>
+          !data.click ||
+          (data.ctrl && !event.ctrlKey) ||
+          (data.meta && !event.metaKey) ||
+          (data.alt && !event.altKey) ||
+          (data.shift && !event.shiftKey) ||
+          (data.main && event.button !== 0) ||
+          // (data.auxiliar && event.button !== 1) ||
+          (data.auxiliar && btn !== "auxiliar") ||
+          // (data.secondary && event.button !== 2) ||
+          (data.secondary && btn !== "secondary")
+            ? false
+            : true
+        )
+      })
+
+      console.log(`showing menu`, [...contextMenu.value], btn)
+
+      if (contextMenu.value.length > 0) visible.value = true
+      return false
     }
 
     return {
@@ -213,18 +163,10 @@ export default /*#__PURE__*/ defineComponent({
         top: `${location.value.y}px`,
       })),
 
+      onClick,
       contextMenu,
       slotContextMenu,
       selectedItem: computed(() => selectedItem.value ?? ""),
-      onClick: (event: MouseEvent, mode: MouseClick, btn: MouseOptionButtons) => {
-        console.log(`Executing contextMenu '${mode}:${btn}'`, event);
-
-        visible.value = false
-        if (props.active === false) return
-
-        if (typeof props.options === 'string') showSlotMenu(event)
-        else showContextMenu(event, mode, btn)
-      },
 
       optionClicked(action: string) {
         hideContextMenu()
@@ -246,14 +188,11 @@ export default /*#__PURE__*/ defineComponent({
   <div
     v-bind="$attrs"
     class="vue-context-menu__content"
-    @click.left.stop.prevent="onClick($event, 'click', 'main')"
-    @click.middle.stop.prevent="onClick($event, 'click', 'auxiliar')"
-    @dblclick.left.stop.prevent="onClick($event, 'dblclick', 'main')"
-    @dblclick.middle.stop.prevent="onClick($event, 'dblclick', 'auxiliar')"
-    @contextmenu.stop.prevent="onClick($event, 'click', 'secondary')"
+    @click.prevent.stop="onClick($event, 'click')"
+    @dblclick.prevent.stop="onClick($event, 'dblclick', 'main')"
+    @click.middle.prevent.stop="onClick($event, 'click', 'auxiliar')"
+    @contextmenu.prevent.stop="onClick($event, 'click', 'secondary')"
   >
-    <!-- @click.right.stop.prevent="onClick($event, 'click', 'secondary')"
-    @dblclick.right.stop.prevent="onClick($event, 'dblclick', 'secondary')" -->
     <slot />
   </div>
 

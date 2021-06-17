@@ -4,15 +4,21 @@ declare const ContextMenu: DefineComponent<{}, {}, any> & { install: Exclude<Plu
 export default ContextMenu;
 
 export type MouseClick = "click" | "dblclick"
-type MouseButton = "main" | "aux" | "sec" | "auxiliar" | "secondary" | "left" | "right"
 type MouseModificators = "ctrl" | "alt" | "shift" | "meta"
 
+type MouseButton = "main" | "left"
+type MouseButtonLong = MouseButton | "secondary" | "right" | "auxiliar" | "middle"
+type MouseButtonShort = "sec" | "aux"
+type AllButtons = MouseButtonLong | MouseButtonShort
+
+type MouseCombination = `${MouseModificators}.${AllButtons}`
 export type MouseEvents =
   | MouseClick
-  | Exclude<MouseButton, "aux" | "sec">
-  | `${MouseModificators}.${MouseButton}`
-  | `${MouseClick}.${MouseButton}`
-  | `${MouseClick}.${MouseModificators}.${MouseButton}`
+  | MouseButtonLong
+  | MouseCombination
+  | `click.${MouseModificators | AllButtons | MouseCombination}`
+  | `dblclick.${MouseModificators | MouseButton}`
+  | `dblclick.${MouseModificators}.${MouseButton}`
 
   /** Defines the behaviour of the Contextual Menu Items */
 export interface ContextualMenuOption {
@@ -32,9 +38,13 @@ export interface ContextualMenuOption {
 
   /** Defines specific items to have this menu option */
   scope?: string | string[]
-  /** Defines specific events when this option is shown */
-  on?: MouseEvents | MouseEvents[]
+  /**
+   * Defines specific events when this option is shown
+   * Should be `MouseEvents` comma separated
+   */
+  on?: string
 }
+
 
 /** Event emmitted by the context menu when an option is clicked */
 export interface ContextualMenuEvent {
@@ -44,6 +54,24 @@ export interface ContextualMenuEvent {
   item: string
 }
 
-export type MouseOptionButtons = "main" | "auxiliar" | "secondary"
-export type MenuOptionName = MouseClick | `${MouseClick}_${MouseOptionButtons}` | `${MouseClick}_${MouseModificators}_${MouseOptionButtons}`
-export type MenuOptions = Map<MenuOptionName, ContextualMenuOption[]>
+// export type MouseOptionButtons = "main" | "auxiliar" | "secondary"
+// export type MenuOptionName = MouseClick | `${MouseClick}_${MouseModificators}` | `${MouseClick}_${MouseOptionButtons}` | `${MouseClick}_${MouseModificators}_${MouseOptionButtons}`
+// export type MenuOptionName =
+//   | MouseClick
+//   | `${MouseClick}.${MouseModificators}`
+//   | `${MouseClick}.${MouseOptionButtons}`
+//   | `${MouseClick}.${MouseModificators}.${MouseOptionButtons}`
+// export type MenuOptions = Map<MenuOptionName, ContextualMenuOption[]>
+
+export interface EventMetaData {
+  click: boolean
+  dblclick: boolean
+  ctrl: boolean
+  meta: boolean
+  alt: boolean
+  shift: boolean
+  main: boolean
+  auxiliar: boolean
+  secondary: boolean
+}
+export type MenuOptions = Array<ContextualMenuOption & { name: string; metaData: Array<EventMetaData> }>

@@ -36,22 +36,6 @@ function _objectSpread2(target) {
   return target;
 }
 
-function _typeof(obj) {
-  "@babel/helpers - typeof";
-
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -206,10 +190,62 @@ function createCommonjsModule(fn) {
 !function(e,n){module.exports=n();}(commonjsGlobal,function(){var e="__v-click-outside",n="undefined"!=typeof window,t="undefined"!=typeof navigator,r=n&&("ontouchstart"in window||t&&navigator.msMaxTouchPoints>0)?["touchstart"]:["click"],i=function(e){var n=e.event,t=e.handler;(0, e.middleware)(n)&&t(n);},a=function(n,t){var a=function(e){var n="function"==typeof e;if(!n&&"object"!=typeof e)throw new Error("v-click-outside: Binding value must be a function or an object");return {handler:n?e:e.handler,middleware:e.middleware||function(e){return e},events:e.events||r,isActive:!(!1===e.isActive),detectIframe:!(!1===e.detectIframe),capture:Boolean(e.capture)}}(t.value),o=a.handler,d=a.middleware,c=a.detectIframe,u=a.capture;if(a.isActive){if(n[e]=a.events.map(function(e){return {event:e,srcTarget:document.documentElement,handler:function(e){return function(e){var n=e.el,t=e.event,r=e.handler,a=e.middleware,o=t.path||t.composedPath&&t.composedPath();(o?o.indexOf(n)<0:!n.contains(t.target))&&i({event:t,handler:r,middleware:a});}({el:n,event:e,handler:o,middleware:d})},capture:u}}),c){var l={event:"blur",srcTarget:window,handler:function(e){return function(e){var n=e.el,t=e.event,r=e.handler,a=e.middleware;setTimeout(function(){var e=document.activeElement;e&&"IFRAME"===e.tagName&&!n.contains(e)&&i({event:t,handler:r,middleware:a});},0);}({el:n,event:e,handler:o,middleware:d})},capture:u};n[e]=[].concat(n[e],[l]);}n[e].forEach(function(t){var r=t.event,i=t.srcTarget,a=t.handler;return setTimeout(function(){n[e]&&i.addEventListener(r,a,u);},0)});}},o=function(n){(n[e]||[]).forEach(function(e){return e.srcTarget.removeEventListener(e.event,e.handler,e.capture)}),delete n[e];},d=n?{beforeMount:a,updated:function(e,n){var t=n.value,r=n.oldValue;JSON.stringify(t)!==JSON.stringify(r)&&(o(e),a(e,{value:t}));},unmounted:o}:{};return {install:function(e){e.directive("click-outside",d);},directive:d}});
 
 });function isValidMouseEvent(str) {
-  return /^(click|dblclick|main|auxiliar|secondary|left|right)?$/.test(str) || /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) || /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|right)$/.test(str) || /^(click|dblclick)((\.(ctrl|alt|shift|meta))?\.(main|auxiliar|secondary|left|right|aux|sec))?$/.test(str);
+  return /^(click|dblclick|main|auxiliar|secondary|left|middle|right)$/.test(str) || /^(ctrl|alt|shift|meta)\.(aux|sec)$/.test(str) || /^((ctrl|alt|shift|meta)\.)?(main|auxiliar|secondary|left|middle|right)$/.test(str) || /^(click|dblclick)(\.(ctrl|alt|shift|meta))?(\.(main|auxiliar|secondary|left|middle|right|aux|sec))?$/.test(str);
 }
 
-var script = /*#__PURE__*/vue.defineComponent({
+function getMetaData(e) {
+  var isDblClick = /^dblclick/.test(e);
+  return {
+    click: !isDblClick,
+    dblclick: isDblClick,
+    ctrl: /ctrl/.test(e),
+    meta: /meta/.test(e),
+    alt: /alt/.test(e),
+    shift: /shift/.test(e),
+    main: /(main|left)/.test(e),
+    auxiliar: !isDblClick && /(aux|middle)/.test(e),
+    secondary: !isDblClick && /(sec|right)/.test(e)
+  };
+}
+
+function compileEvents(eventsString, options) {
+  if (!options || typeof options === "string") return [];
+  var events = (eventsString !== null && eventsString !== void 0 ? eventsString : "").replaceAll(/\s/g, "").split(",").filter(function (name) {
+    return isValidMouseEvent(name);
+  });
+  var menuOptions = [];
+
+  var _iterator = _createForOfIteratorHelper(options),
+      _step;
+
+  try {
+    var _loop = function _loop() {
+      var _opt$name;
+
+      var opt = _step.value;
+      var name = (_opt$name = opt.name) !== null && _opt$name !== void 0 ? _opt$name : Math.random().toString().slice(2, 5);
+      var metaData = [];
+      (!opt.on ? events : Array.isArray(opt.on) ? opt.on : [opt.on]). //
+      forEach(function (event) {
+        return metaData.push(getMetaData(event));
+      });
+      menuOptions.push(_objectSpread2(_objectSpread2({}, opt), {}, {
+        name: name,
+        metaData: metaData
+      }));
+    };
+
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      _loop();
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return menuOptions;
+}var script = /*#__PURE__*/vue.defineComponent({
   name: "ContextMenu",
   inheritAttrs: false,
   emits: ["optionClick"],
@@ -259,19 +295,19 @@ var script = /*#__PURE__*/vue.defineComponent({
 
     /**
      * Defines the events to catch as comma separated strings
-     * e.g: `click.secondary, dblclick.ctrl.right`
+     * e.g: `click.secondary, dblclick.ctrl.left`
      *
      * The `click` can be omited, but the `dblclick` is required to prevent misunderstandings
      * e.g: `main, dblclick.main`
      *
-     * The `left` and `right` are alias of `main` and `secondary` respectively.
-     * @see `ContextualMenuOption["on"]` type for the posible values.
+     * The `left`, `middle` and `right` are alias of `main`, `auxiliar` and `secondary` respectively.
+     * @see `MouseEvents` type for the posible values.
      */
     events: {
       type: String,
       default: "secondary",
       validator: function validator(v) {
-        return /(click|main|aux|sec|left|right)/.test(v);
+        return /(click|ctrl|meta|alt|shift|main|aux|sec|left|middle|right)/.test(v);
       }
     }
   },
@@ -292,77 +328,14 @@ var script = /*#__PURE__*/vue.defineComponent({
     });
     vue.onBeforeUnmount(function () {
       return document.body.removeEventListener("keyup", onEscKeyRelease);
-    });
+    }); // ? Mantener sincronizado el conjunto de posibles menus
 
-    var __events = vue.ref([]);
-
-    var __catchClick = vue.ref(false);
-
-    var __catchDblClick = vue.ref(false);
-
-    vue.watchEffect(function () {
-      __catchClick.value = __catchDblClick.value = false;
-      __events.value = props.events.split(",").filter(function (e) {
-        var valid = isValidMouseEvent(e);
-
-        if (valid) {
-          if (/^dblclick/.test(e)) __catchDblClick.value = true;else __catchClick.value = true;
-        }
-
-        return valid;
-      });
-    });
-
-    var compileNameEvent = function compileNameEvent(e) {
-      if (!e) return;
-      var btn = undefined;
-      if (/(main|left)/.test(e)) btn = "main";else if (/(sec|right)/.test(e)) btn = "secondary";else if (/(aux)/.test(e)) btn = "auxiliar";
-      if (!btn) return;
-      var event = /^dblclick/.test(e) ? "dblclick" : "click";
-      var mod = "_";
-      if (/ctrl\./.test(e)) mod = "_ctrl_";else if (/alt\./.test(e)) mod = "_alt_";else if (/shift\./.test(e)) mod = "_shift_";else if (/meta\./.test(e)) mod = "_meta_";
-      return "".concat(event).concat(mod).concat(btn);
-    }; // ? Mantener sincronizado el conjunto de posibles menus
+    var __menuOptions = vue.computed(function () {
+      return Array.isArray(props.options) //
+      ? compileEvents(props.events, props.options) : [];
+    }); // ? Stores mouse location
 
 
-    var __menuOptionsMap = vue.ref(new Map());
-
-    vue.watchEffect(function () {
-      if (typeof props.options === 'string') return;
-      __menuOptionsMap.value = new Map();
-      props.options.forEach(function (opt) {
-        var _opt$name;
-
-        var name = (_opt$name = opt.name) !== null && _opt$name !== void 0 ? _opt$name : "no-name-".concat(Math.random().toString().slice(2, 5));
-
-        if (!opt.on) {
-          __events.value.forEach(function (e) {
-            var _menuOptionsMap$valu;
-
-            var menuName = compileNameEvent(e);
-            if (!menuName) return;
-            var menu = (_menuOptionsMap$valu = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu !== void 0 ? _menuOptionsMap$valu : [];
-
-            __menuOptionsMap.value.set(menuName, [].concat(_toConsumableArray(menu), [_objectSpread2(_objectSpread2({}, _typeof(opt) === "object" ? opt : {}), {}, {
-              name: name
-            })]));
-          });
-        }
-
-        var events = Array.isArray(opt.on) ? opt.on : Array(opt.on);
-        events.forEach(function (e) {
-          var _menuOptionsMap$valu2;
-
-          var menuName = compileNameEvent(e);
-          if (!menuName) return;
-          var menu = (_menuOptionsMap$valu2 = __menuOptionsMap.value.get(menuName)) !== null && _menuOptionsMap$valu2 !== void 0 ? _menuOptionsMap$valu2 : [];
-
-          __menuOptionsMap.value.set(menuName, [].concat(_toConsumableArray(menu), [_objectSpread2(_objectSpread2({}, _typeof(opt) === "object" ? opt : {}), {}, {
-            name: name
-          })]));
-        });
-      });
-    });
     var location = vue.ref({
       x: 0,
       y: 0
@@ -412,41 +385,44 @@ var script = /*#__PURE__*/vue.defineComponent({
     }; // ? Actualizar el menu mostrado
 
 
+    var slotContextMenu = vue.ref();
     var contextMenu = vue.ref([]);
 
-    var showContextMenu = function showContextMenu(event, ev, btn) {
+    var onClick = function onClick(event, mode, btn) {
+      visible.value = false;
+      if (props.active === false) return;
+      event.stopImmediatePropagation();
       var id = setSelectedItem(event);
       if (!id || id.length < 1) return;
-      var mod = "_";
-      if (event.ctrlKey) mod = "_ctrl_";else if (event.altKey) mod = "_alt_";else if (event.shiftKey) mod = "_shift_";else if (event.metaKey) mod = "_meta_";
-      var menuName = "".concat(ev).concat(mod).concat(btn);
-
-      var menu = __menuOptionsMap.value.get(menuName);
-
-      if (!menu) contextMenu.value = [];else {
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        setLocation(event);
-        contextMenu.value = menu;
-        visible.value = true;
-      }
-    };
-
-    var slotContextMenu = vue.ref();
-
-    var showSlotMenu = function showSlotMenu(event) {
-      var id = setSelectedItem(event);
-
-      if (typeof props.options !== 'string' || !id || id.length < 1) {
-        slotContextMenu.value = undefined;
-        return;
-      }
-
-      event.stopImmediatePropagation();
       event.preventDefault();
-      setLocation(event);
-      slotContextMenu.value = props.options;
-      visible.value = true;
+      setLocation(event); // console.log(`Executing contextMenu '${mode}:${btn}'`, event)
+
+      if (typeof props.options === "string") {
+        slotContextMenu.value = props.options;
+        visible.value = true;
+        return false;
+      }
+
+      console.log("events", _toConsumableArray(__menuOptions.value));
+      contextMenu.value = __menuOptions.value.filter(function (option) {
+        if (mode === "dblclick") {
+          return option.metaData.some(function (data) {
+            return !data.dblclick || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || event.button !== 0 ? false : true;
+          });
+        } // Single click
+
+
+        return option.metaData.some(function (data) {
+          return (// return option.metaData.some(data =>
+            !data.click || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || data.main && event.button !== 0 || // (data.auxiliar && event.button !== 1) ||
+            data.auxiliar && btn !== "auxiliar" || // (data.secondary && event.button !== 2) ||
+            data.secondary && btn !== "secondary" ? false : true
+          );
+        });
+      });
+      console.log("showing menu", _toConsumableArray(contextMenu.value), btn);
+      if (contextMenu.value.length > 0) visible.value = true;
+      return false;
     };
 
     return {
@@ -459,6 +435,7 @@ var script = /*#__PURE__*/vue.defineComponent({
           top: "".concat(location.value.y, "px")
         };
       }),
+      onClick: onClick,
       contextMenu: contextMenu,
       slotContextMenu: slotContextMenu,
       selectedItem: vue.computed(function () {
@@ -466,12 +443,6 @@ var script = /*#__PURE__*/vue.defineComponent({
 
         return (_selectedItem$value = selectedItem.value) !== null && _selectedItem$value !== void 0 ? _selectedItem$value : "";
       }),
-      onClick: function onClick(event, mode, btn) {
-        console.log("Executing contextMenu '".concat(mode, ":").concat(btn, "'"), event);
-        visible.value = false;
-        if (props.active === false) return;
-        if (typeof props.options === 'string') showSlotMenu(event);else showContextMenu(event, mode, btn);
-      },
       optionClicked: function optionClicked(action) {
         hideContextMenu();
         emit("optionClick", {
@@ -499,19 +470,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return vue.openBlock(), vue.createBlock(vue.Fragment, null, [vue.createVNode("div", vue.mergeProps(_ctx.$attrs, {
     class: "vue-context-menu__content",
     onClick: _cache[1] || (_cache[1] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'click', 'main');
-    }, ["left", "stop", "prevent"])),
-    onMouseup: _cache[2] || (_cache[2] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'click', 'auxiliar');
-    }, ["middle", "stop", "prevent"])),
-    onDblclick: [_cache[3] || (_cache[3] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'click');
+    }, ["prevent", "stop"])),
+    onDblclick: _cache[2] || (_cache[2] = vue.withModifiers(function ($event) {
       return _ctx.onClick($event, 'dblclick', 'main');
-    }, ["left", "stop", "prevent"])), _cache[4] || (_cache[4] = vue.withModifiers(function ($event) {
-      return _ctx.onClick($event, 'dblclick', 'auxiliar');
-    }, ["middle", "stop", "prevent"]))],
-    onContextmenu: _cache[5] || (_cache[5] = vue.withModifiers(function ($event) {
+    }, ["prevent", "stop"])),
+    onMouseup: _cache[3] || (_cache[3] = vue.withModifiers(function ($event) {
+      return _ctx.onClick($event, 'click', 'auxiliar');
+    }, ["middle", "prevent", "stop"])),
+    onContextmenu: _cache[4] || (_cache[4] = vue.withModifiers(function ($event) {
       return _ctx.onClick($event, 'click', 'secondary');
-    }, ["stop", "prevent"]))
+    }, ["prevent", "stop"]))
   }), [vue.renderSlot(_ctx.$slots, "default")], 16), _ctx.visible ? vue.withDirectives((vue.openBlock(), vue.createBlock("div", {
     key: 0,
     class: "vue-context-menu",
