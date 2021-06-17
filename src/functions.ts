@@ -47,3 +47,34 @@ export function compileEvents(eventsString?: string, options?: string | Contextu
   }
   return menuOptions
 }
+
+export function matchEvent(event: MouseEvent, metaData: EventMetaData[], mode: string, btn?: string): boolean {
+  if (mode === "dblclick") {
+    return metaData.some(data =>
+      !data.dblclick ||
+      (data.ctrl && !event.ctrlKey) ||
+      (data.meta && !event.metaKey) ||
+      (data.alt && !event.altKey) ||
+      (data.shift && !event.shiftKey) ||
+      event.button !== 0
+        ? false
+        : true
+    )
+  }
+
+  // Single click
+  return metaData.some(data =>
+    !data.click ||
+    (data.ctrl && !event.ctrlKey) ||
+    (data.meta && !event.metaKey) ||
+    (data.alt && !event.altKey) ||
+    (data.shift && !event.shiftKey) ||
+    (data.main && event.button !== 0) ||
+    // (data.auxiliar && event.button !== 1) ||
+    (data.auxiliar && btn !== "auxiliar") ||
+    // (data.secondary && event.button !== 2) ||
+    (data.secondary && btn !== "secondary")
+      ? false
+      : true
+  )
+}

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
 import { ContextualMenuOption, MenuOptions, MouseClick } from "vue-context-menu"
-import { compileEvents } from "./functions"
+import { compileEvents, matchEvent } from "./functions"
 
 export default /*#__PURE__*/ defineComponent({
   name: "ContextMenu",
@@ -60,7 +60,7 @@ export default /*#__PURE__*/ defineComponent({
     const __menuOptions = computed<MenuOptions>(() =>
       Array.isArray(props.options) //
         ? compileEvents(props.events, props.options as ContextualMenuOption[])
-        : []
+        : compileEvents(props.events, [{}] as ContextualMenuOption[])
     )
 
     // ? Stores mouse location
@@ -110,47 +110,18 @@ export default /*#__PURE__*/ defineComponent({
       event.preventDefault()
       setLocation(event)
 
-      // console.log(`Executing contextMenu '${mode}:${btn}'`, event)
-      if (typeof props.options === "string") {
+      if (
+        typeof props.options === "string" &&
+        __menuOptions.value.length === 1 &&
+        matchEvent(event, __menuOptions.value[0].metaData, mode, btn)
+      ) {
         slotContextMenu.value = props.options
         visible.value = true
         return false
       }
-      console.log("events", [...__menuOptions.value])
 
-      contextMenu.value = __menuOptions.value.filter(option => {
-        if (mode === "dblclick") {
-          return option.metaData.some(data =>
-            !data.dblclick ||
-            (data.ctrl && !event.ctrlKey) ||
-            (data.meta && !event.metaKey) ||
-            (data.alt && !event.altKey) ||
-            (data.shift && !event.shiftKey) ||
-            event.button !== 0
-              ? false
-              : true
-          )
-        }
-
-        // Single click
-        return option.metaData.some(data =>
-          // return option.metaData.some(data =>
-          !data.click ||
-          (data.ctrl && !event.ctrlKey) ||
-          (data.meta && !event.metaKey) ||
-          (data.alt && !event.altKey) ||
-          (data.shift && !event.shiftKey) ||
-          (data.main && event.button !== 0) ||
-          // (data.auxiliar && event.button !== 1) ||
-          (data.auxiliar && btn !== "auxiliar") ||
-          // (data.secondary && event.button !== 2) ||
-          (data.secondary && btn !== "secondary")
-            ? false
-            : true
-        )
-      })
-
-      console.log(`showing menu`, [...contextMenu.value], btn)
+      contextMenu.value = __menuOptions.value.filter(option => matchEvent(event, option.metaData, mode, btn))
+      console.log(`showing menu`, [...contextMenu.value], [...__menuOptions.value])
 
       if (contextMenu.value.length > 0) visible.value = true
       return false

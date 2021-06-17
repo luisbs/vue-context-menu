@@ -51,6 +51,16 @@ function compileEvents(eventsString, options) {
 
   return menuOptions;
 }
+function matchEvent(event, metaData, mode, btn) {
+  if (mode === "dblclick") {
+    return metaData.some(data => !data.dblclick || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || event.button !== 0 ? false : true);
+  } // Single click
+
+
+  return metaData.some(data => !data.click || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || data.main && event.button !== 0 || // (data.auxiliar && event.button !== 1) ||
+  data.auxiliar && btn !== "auxiliar" || // (data.secondary && event.button !== 2) ||
+  data.secondary && btn !== "secondary" ? false : true);
+}
 
 var script = /*#__PURE__*/defineComponent({
   name: "ContextMenu",
@@ -132,7 +142,7 @@ var script = /*#__PURE__*/defineComponent({
     onBeforeUnmount(() => document.body.removeEventListener("keyup", onEscKeyRelease)); // ? Mantener sincronizado el conjunto de posibles menus
 
     const __menuOptions = computed(() => Array.isArray(props.options) //
-    ? compileEvents(props.events, props.options) : []); // ? Stores mouse location
+    ? compileEvents(props.events, props.options) : compileEvents(props.events, [{}])); // ? Stores mouse location
 
 
     const location = ref({
@@ -183,27 +193,16 @@ var script = /*#__PURE__*/defineComponent({
       const id = setSelectedItem(event);
       if (!id || id.length < 1) return;
       event.preventDefault();
-      setLocation(event); // console.log(`Executing contextMenu '${mode}:${btn}'`, event)
+      setLocation(event);
 
-      if (typeof props.options === "string") {
+      if (typeof props.options === "string" && __menuOptions.value.length === 1 && matchEvent(event, __menuOptions.value[0].metaData, mode, btn)) {
         slotContextMenu.value = props.options;
         visible.value = true;
         return false;
       }
 
-      console.log("events", [...__menuOptions.value]);
-      contextMenu.value = __menuOptions.value.filter(option => {
-        if (mode === "dblclick") {
-          return option.metaData.some(data => !data.dblclick || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || event.button !== 0 ? false : true);
-        } // Single click
-
-
-        return option.metaData.some(data => // return option.metaData.some(data =>
-        !data.click || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || data.main && event.button !== 0 || // (data.auxiliar && event.button !== 1) ||
-        data.auxiliar && btn !== "auxiliar" || // (data.secondary && event.button !== 2) ||
-        data.secondary && btn !== "secondary" ? false : true);
-      });
-      console.log(`showing menu`, [...contextMenu.value], btn);
+      contextMenu.value = __menuOptions.value.filter(option => matchEvent(event, option.metaData, mode, btn));
+      console.log(`showing menu`, [...contextMenu.value], [...__menuOptions.value]);
       if (contextMenu.value.length > 0) visible.value = true;
       return false;
     };
