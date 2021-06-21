@@ -60,6 +60,24 @@ function matchEvent(event, metaData, mode, btn) {
   return metaData.some(data => !data.click || data.ctrl && !event.ctrlKey || data.meta && !event.metaKey || data.alt && !event.altKey || data.shift && !event.shiftKey || data.main && event.button !== 0 || // (data.auxiliar && event.button !== 1) ||
   data.auxiliar && btn !== "auxiliar" || // (data.secondary && event.button !== 2) ||
   data.secondary && btn !== "secondary" ? false : true);
+} // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
+
+function findInPath(event, delimiter) {
+  try {
+    var _ref, _ref2;
+
+    const path = (_ref = (_ref2 = event.composedPath()) !== null && _ref2 !== void 0 ? _ref2 : event.path) !== null && _ref !== void 0 ? _ref : [];
+
+    for (const el of path) {
+      var _el$parentElement;
+
+      if ((_el$parentElement = el.parentElement) !== null && _el$parentElement !== void 0 && _el$parentElement.classList.contains(delimiter)) return el.id;
+    }
+  } catch (error) {
+    console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${delimiter}'`);
+  }
+
+  return event.target.id || undefined;
 }
 
 var script = /*#__PURE__*/defineComponent({
@@ -158,39 +176,7 @@ var script = /*#__PURE__*/defineComponent({
     }; // ? Controls wich element has been clicked
 
 
-    const selectedItem = ref();
-
-    const setSelectedItem = event => {
-      try {
-        const t = event;
-        console.log(`Looking for selected element on container with class '${props.delimiter}'`);
-        console.log("Path", t, t.path);
-        let id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
-
-        for (const el of t.path) {
-          var _el$classList;
-
-          console.log(`stored id: '${id}', testing:`, el, el === null || el === void 0 ? void 0 : el.classList);
-
-          if (el !== null && el !== void 0 && (_el$classList = el.classList) !== null && _el$classList !== void 0 && _el$classList.contains(props.delimiter)) {
-            console.log(`found delimiter, selected child with id '${id}'`);
-            selectedItem.value = id;
-            return id;
-          } // else id = el.id
-          // ? Store child id
-          else {
-              console.log(`storing '${el.id}', going up`);
-              id = el.id;
-            }
-        }
-      } catch (error) {
-        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`);
-      }
-
-      selectedItem.value = undefined;
-      return undefined;
-    }; // ? Actualizar el menu mostrado
-
+    const selectedItem = ref(); // ? Actualizar el menu mostrado
 
     const slotContextMenu = ref();
     const contextMenu = ref([]);
@@ -199,8 +185,9 @@ var script = /*#__PURE__*/defineComponent({
       visible.value = false;
       if (props.active === false) return;
       event.stopImmediatePropagation();
-      const id = setSelectedItem(event);
+      const id = findInPath(event, props.delimiter);
       if (!id || id.length < 1) return;
+      selectedItem.value = id;
       event.preventDefault();
       setLocation(event);
 

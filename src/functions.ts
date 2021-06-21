@@ -78,3 +78,17 @@ export function matchEvent(event: MouseEvent, metaData: EventMetaData[], mode: s
       : true
   )
 }
+
+// ? subir por el path de elementos hasta encontrar el elemento wrapper del context
+export function findInPath(event: Event, delimiter: string): string | undefined {
+  try {
+    const path = (event.composedPath() as HTMLElement[]) ?? ((event as unknown) as { path: HTMLElement[] }).path ?? []
+    for (const el of path) {
+      if (el.parentElement?.classList.contains(delimiter)) return el.id
+    }
+  } catch (error) {
+    console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${delimiter}'`)
+  }
+
+  return (event.target as HTMLElement).id || undefined
+}

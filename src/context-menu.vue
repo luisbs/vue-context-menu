@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
 import { ContextualMenuOption, MenuOptions, MouseClick } from "vue-context-menu"
-import { compileEvents, matchEvent } from "./functions"
+import { compileEvents, matchEvent, findInPath } from "./functions"
 
 export default /*#__PURE__*/ defineComponent({
   name: "ContextMenu",
@@ -74,38 +74,6 @@ export default /*#__PURE__*/ defineComponent({
 
     // ? Controls wich element has been clicked
     const selectedItem = ref<string>()
-    const setSelectedItem = (event: MouseEvent): string | undefined => {
-      try {
-        const t = (event as unknown) as { path: HTMLElement[] }
-
-        console.log(`Looking for selected element on container with class '${props.delimiter}'`)
-        console.log("Path", t, t.path)
-
-        let id: string | undefined = undefined
-        // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
-        for (const el of t.path) {
-          console.log(`stored id: '${id}', testing:`, el, el?.classList)
-
-          if (el?.classList?.contains(props.delimiter)) {
-            console.log(`found delimiter, selected child with id '${id}'`)
-
-            selectedItem.value = id
-            return id
-          }
-          // else id = el.id
-
-          // ? Store child id
-          else {
-            console.log(`storing '${el.id}', going up`)
-            id = el.id
-          }
-        }
-      } catch (error) {
-        console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`)
-      }
-      selectedItem.value = undefined
-      return undefined
-    }
 
     // ? Actualizar el menu mostrado
     const slotContextMenu = ref<string>()
@@ -115,8 +83,9 @@ export default /*#__PURE__*/ defineComponent({
       if (props.active === false) return
       event.stopImmediatePropagation()
 
-      const id = setSelectedItem(event)
+      const id = findInPath(event, props.delimiter)
       if (!id || id.length < 1) return
+      selectedItem.value = id
 
       event.preventDefault()
       setLocation(event)
