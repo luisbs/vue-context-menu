@@ -352,7 +352,8 @@ function matchEvent(event, metaData, mode, btn) {
     var setSelectedItem = function setSelectedItem(event) {
       try {
         var t = event;
-        console.log("Looking for selected element on ".concat(props.delimiter));
+        console.log("Looking for selected element on container with class '".concat(props.delimiter, "'"));
+        console.log("Path", t, t.path);
         var id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
         var _iterator = _createForOfIteratorHelper(t.path),

@@ -163,7 +163,8 @@ var script = /*#__PURE__*/defineComponent({
     const setSelectedItem = event => {
       try {
         const t = event;
-        console.log(`Looking for selected element on ${props.delimiter}`);
+        console.log(`Looking for selected element on container with class '${props.delimiter}'`);
+        console.log("Path", t, t.path);
         let id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
         for (const el of t.path) {

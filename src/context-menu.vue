@@ -78,7 +78,8 @@ export default /*#__PURE__*/ defineComponent({
       try {
         const t = (event as unknown) as { path: HTMLElement[] }
 
-        console.log(`Looking for selected element on ${props.delimiter}`)
+        console.log(`Looking for selected element on container with class '${props.delimiter}'`)
+        console.log("Path", t, t.path)
 
         let id: string | undefined = undefined
         // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
