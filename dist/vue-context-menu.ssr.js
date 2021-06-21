@@ -352,6 +352,7 @@ function matchEvent(event, metaData, mode, btn) {
     var setSelectedItem = function setSelectedItem(event) {
       try {
         var t = event;
+        console.log("Looking for selected element on ".concat(props.delimiter));
         var id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
         var _iterator = _createForOfIteratorHelper(t.path),
@@ -362,12 +363,18 @@ function matchEvent(event, metaData, mode, btn) {
             var _el$classList;
 
             var el = _step.value;
+            console.log("stored id: '".concat(id, "', testing:"), el, el === null || el === void 0 ? void 0 : el.classList);
 
             if (el !== null && el !== void 0 && (_el$classList = el.classList) !== null && _el$classList !== void 0 && _el$classList.contains(props.delimiter)) {
+              console.log("found delimiter, selected child with id '".concat(id, "'"));
               selectedItem.value = id;
               return id;
-            } // ? Store child id
-            else id = el.id;
+            } // else id = el.id
+            // ? Store child id
+            else {
+                console.log("storing '".concat(el.id, "', going up"));
+                id = el.id;
+              }
           }
         } catch (err) {
           _iterator.e(err);

@@ -163,16 +163,24 @@ var script = /*#__PURE__*/defineComponent({
     const setSelectedItem = event => {
       try {
         const t = event;
+        console.log(`Looking for selected element on ${props.delimiter}`);
         let id = undefined; // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
         for (const el of t.path) {
           var _el$classList;
 
+          console.log(`stored id: '${id}', testing:`, el, el === null || el === void 0 ? void 0 : el.classList);
+
           if (el !== null && el !== void 0 && (_el$classList = el.classList) !== null && _el$classList !== void 0 && _el$classList.contains(props.delimiter)) {
+            console.log(`found delimiter, selected child with id '${id}'`);
             selectedItem.value = id;
             return id;
-          } // ? Store child id
-          else id = el.id;
+          } // else id = el.id
+          // ? Store child id
+          else {
+              console.log(`storing '${el.id}', going up`);
+              id = el.id;
+            }
         }
       } catch (error) {
         console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`);
