@@ -112,7 +112,7 @@ export default defineComponent({
         </context-menu>
 
         <!-- Custom -->
-        <context-menu delimiter="elements-wrapper" events="secondary" options="menu" @optionClick="onMenuClick">
+        <context-menu delimiter="elements-wrapper" attr="uuid" events="secondary" options="menu" @optionClick="onMenuClick">
           <template v-slot:menu="{ onClick }">
             <ul class="own-menu">
               <li @click="onClick('move_up')">Subir</li>
@@ -123,7 +123,7 @@ export default defineComponent({
           </template>
 
           <ul class="elements-wrapper">
-            <li v-for="{ key, value } in elements" :key="key" :id="key">{{ value }}</li>
+            <li v-for="{ key, value } in elements" :key="key" :uuid="key">{{ value }}</li>
           </ul>
         </context-menu>
       </div>

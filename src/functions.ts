@@ -84,8 +84,7 @@ export function findInPath(event: Event, delimiter: string, attr = "id"): string
   try {
     const path = (event.composedPath() as HTMLElement[]) ?? ((event as unknown) as { path: HTMLElement[] }).path ?? []
     for (const el of path) {
-      if (el.parentElement?.classList.contains(delimiter))
-      return el.getAttribute(attr) ?? el.id
+      if (el.parentElement?.classList.contains(delimiter)) return el.getAttribute(attr) ?? el.id
     }
   } catch (error) {
     console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${delimiter}'`)

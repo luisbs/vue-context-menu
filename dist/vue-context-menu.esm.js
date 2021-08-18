@@ -62,16 +62,16 @@ function matchEvent(event, metaData, mode, btn) {
   data.secondary && btn !== "secondary" ? false : true);
 } // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
-function findInPath(event, delimiter) {
+function findInPath(event, delimiter, attr = "id") {
   try {
     var _ref, _ref2;
 
     const path = (_ref = (_ref2 = event.composedPath()) !== null && _ref2 !== void 0 ? _ref2 : event.path) !== null && _ref !== void 0 ? _ref : [];
 
     for (const el of path) {
-      var _el$parentElement;
+      var _el$parentElement, _el$getAttribute;
 
-      if ((_el$parentElement = el.parentElement) !== null && _el$parentElement !== void 0 && _el$parentElement.classList.contains(delimiter)) return el.id;
+      if ((_el$parentElement = el.parentElement) !== null && _el$parentElement !== void 0 && _el$parentElement.classList.contains(delimiter)) return (_el$getAttribute = el.getAttribute(attr)) !== null && _el$getAttribute !== void 0 ? _el$getAttribute : el.id;
     }
   } catch (error) {
     console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${delimiter}'`);
@@ -110,10 +110,16 @@ var script = /*#__PURE__*/defineComponent({
     /** Defines a class for the contextual menu wrapper */
     menuClass: String,
 
-    /** Defines a custom class delimitir for complex layouts */
+    /** Defines a custom class delimitir for indentification of the elements inside a complex html layout */
     delimiter: {
       type: String,
       default: "vue-context-menu__content"
+    },
+
+    /** Defines the html attr to use as the element identifier (Default: `id`) */
+    attr: {
+      type: String,
+      default: "id"
     },
 
     /** Corrects offsetX when using `position: relative` on parent */
@@ -185,7 +191,8 @@ var script = /*#__PURE__*/defineComponent({
       visible.value = false;
       if (props.active === false) return;
       event.stopImmediatePropagation();
-      const id = findInPath(event, props.delimiter);
+      const id = findInPath(event, props.delimiter, props.attr); // console.log(`find: '${id}' in attr='${props.attr}' on '${props.delimiter}'`)
+
       if (!id || id.length < 1) return;
       selectedItem.value = id;
       event.preventDefault();

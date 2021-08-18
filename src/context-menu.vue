@@ -86,6 +86,7 @@ export default /*#__PURE__*/ defineComponent({
       event.stopImmediatePropagation()
 
       const id = findInPath(event, props.delimiter, props.attr)
+      // console.log(`find: '${id}' in attr='${props.attr}' on '${props.delimiter}'`)
       if (!id || id.length < 1) return
       selectedItem.value = id
 

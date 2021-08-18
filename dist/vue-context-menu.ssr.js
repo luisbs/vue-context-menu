@@ -246,6 +246,8 @@ function matchEvent(event, metaData, mode, btn) {
 } // ? subir por el path de elementos hasta encontrar el elemento wrapper del context
 
 function findInPath(event, delimiter) {
+  var attr = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "id";
+
   try {
     var _ref, _ref2;
 
@@ -256,10 +258,10 @@ function findInPath(event, delimiter) {
 
     try {
       for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        var _el$parentElement;
+        var _el$parentElement, _el$getAttribute;
 
         var el = _step2.value;
-        if ((_el$parentElement = el.parentElement) !== null && _el$parentElement !== void 0 && _el$parentElement.classList.contains(delimiter)) return el.id;
+        if ((_el$parentElement = el.parentElement) !== null && _el$parentElement !== void 0 && _el$parentElement.classList.contains(delimiter)) return (_el$getAttribute = el.getAttribute(attr)) !== null && _el$getAttribute !== void 0 ? _el$getAttribute : el.id;
       }
     } catch (err) {
       _iterator2.e(err);
@@ -301,10 +303,16 @@ function findInPath(event, delimiter) {
     /** Defines a class for the contextual menu wrapper */
     menuClass: String,
 
-    /** Defines a custom class delimitir for complex layouts */
+    /** Defines a custom class delimitir for indentification of the elements inside a complex html layout */
     delimiter: {
       type: String,
       default: "vue-context-menu__content"
+    },
+
+    /** Defines the html attr to use as the element identifier (Default: `id`) */
+    attr: {
+      type: String,
+      default: "id"
     },
 
     /** Corrects offsetX when using `position: relative` on parent */
@@ -384,7 +392,8 @@ function findInPath(event, delimiter) {
       visible.value = false;
       if (props.active === false) return;
       event.stopImmediatePropagation();
-      var id = findInPath(event, props.delimiter);
+      var id = findInPath(event, props.delimiter, props.attr); // console.log(`find: '${id}' in attr='${props.attr}' on '${props.delimiter}'`)
+
       if (!id || id.length < 1) return;
       selectedItem.value = id;
       event.preventDefault();
