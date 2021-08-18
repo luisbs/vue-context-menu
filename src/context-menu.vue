@@ -23,8 +23,10 @@ export default /*#__PURE__*/ defineComponent({
     iconFormat: String,
     /** Defines a class for the contextual menu wrapper */
     menuClass: String,
-    /** Defines a custom class delimitir for complex layouts */
+    /** Defines a custom class delimitir for indentification of the elements inside a complex html layout */
     delimiter: { type: String, default: "vue-context-menu__content" },
+    /** Defines the html attr to use as the element identifier (Default: `id`) */
+    attr: { type: String, default: "id" },
     /** Corrects offsetX when using `position: relative` on parent */
     offsetX: { type: Number, default: 0 },
     /** Corrects offsetY when using `position: relative` on parent */
@@ -83,7 +85,7 @@ export default /*#__PURE__*/ defineComponent({
       if (props.active === false) return
       event.stopImmediatePropagation()
 
-      const id = findInPath(event, props.delimiter)
+      const id = findInPath(event, props.delimiter, props.attr)
       if (!id || id.length < 1) return
       selectedItem.value = id
 
