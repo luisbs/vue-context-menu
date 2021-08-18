@@ -23,8 +23,10 @@ export default /*#__PURE__*/ defineComponent({
     iconFormat: String,
     /** Defines a class for the contextual menu wrapper */
     menuClass: String,
-    /** Defines a custom class delimitir for complex layouts */
+    /** Defines a custom class delimitir for indentification of the elements inside a complex html layout */
     delimiter: { type: String, default: "vue-context-menu__content" },
+    /** Defines the html attr to use as the element identifier (Default: `id`) */
+    attr: { type: String, default: "id" },
     /** Corrects offsetX when using `position: relative` on parent */
     offsetX: { type: Number, default: 0 },
     /** Corrects offsetY when using `position: relative` on parent */
@@ -87,7 +89,7 @@ export default /*#__PURE__*/ defineComponent({
           }
 
           // ? Store child id
-          else id = el.id
+          else id = (props.attr !== "id" ? el.getAttribute(props.attr) : el.id) ?? el.id
         }
       } catch (error) {
         console.warn(`vue-context-menu: Not found child element attr 'id' of element with class '${props.delimiter}'`)
