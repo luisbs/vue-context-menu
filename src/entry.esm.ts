@@ -1,8 +1,7 @@
 import { App, DefineComponent, Plugin } from "vue"
-import vClickOutside from "click-outside-vue3"
 
 // Import vue component
-import component from "@/context-menu.vue"
+import component from "@/file-explorer.vue"
 
 // Define typescript interfaces for installable component
 type InstallableComponent = DefineComponent<{}, {}, any> & { install: Exclude<Plugin["install"], undefined> }
@@ -16,8 +15,7 @@ export default /*#__PURE__*/ ((): InstallableComponent => {
 
   // Attach install function executed by Vue.use()
   installable.install = (app: App) => {
-    app.use(vClickOutside)
-    app.component("ContextMenu", installable)
+    app.component("FileExplorer", installable)
   }
   return installable
 })()
