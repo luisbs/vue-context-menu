@@ -1,7 +1,7 @@
 import { defineComponent, ref, watchEffect, computed, openBlock, createBlock, createVNode, renderSlot, Fragment, renderList, toDisplayString } from 'vue';
 
 var script = /*#__PURE__*/defineComponent({
-  name: "VueFileExplorer",
+  name: "FileExplorer",
   emits: ["initialLoad", "load", "rename"],
   props: {
     layout: {
