@@ -1,8 +1,8 @@
 import { createApp } from "vue"
 import Dev from "./serve.vue"
-import Explorer from "@/entry"
+import ContextMenu from "@/entry"
 
 const app = createApp(Dev)
-app.use(Explorer)
+app.use(ContextMenu)
 
 app.mount("#app")

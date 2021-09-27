@@ -57,118 +57,70 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }var script = /*#__PURE__*/vue.defineComponent({
   name: "FileExplorer",
-  emits: ["initialLoad", "folderLoad", "event"],
+  emits: ["initialLoad", "load", "rename"],
   props: {
     layout: {
       type: String,
-      default: "cards",
+      default: "details",
       validator: function validator(v) {
         return ["details", "cards"].includes(v);
       }
     },
     render: Function
   },
-  setup: function setup(props, _ref) {
-    var emit = _ref.emit;
-
+  setup: function setup(props) {
     var _layout = vue.ref(props.layout);
 
-    var Tree = vue.ref(new Map());
-    var folderId = vue.ref(0);
-
-    var appendToTree = function appendToTree(news) {
-      return news.forEach(function (v, k) {
-        return Tree.value.set(k, v);
-      });
-    };
-
-    emit("initialLoad", appendToTree);
-    folderId.value = Array.from(Tree.value.keys()).shift() || 0;
-
-    var attach = function attach(selector, listener) {
-      return document.querySelectorAll(".vfe ".concat(selector)).forEach(function (el) {
-        return el.onclick = function (ev) {
-          return listener(ev, el);
-        };
-      });
-    };
-
-    var attachListeners = function attachListeners() {
-      attach("button[data-open]", function (_, el) {
-        folderId.value = el.dataset.open || 0;
-        emit("folderLoad", folderId.value, appendToTree, Tree.value.has(folderId.value));
-      });
-      attach(".vfe-folder button[data-action]", function (_, el) {
-        return emit("event", {
-          type: "folder",
-          event: el.dataset.action || "unknown",
-          elementId: el.dataset.element || 0
-        });
-      });
-      attach(".vfe-file button[data-action]", function (_, el) {
-        return emit("event", {
-          type: "file",
-          event: el.dataset.action || "unknown",
-          elementId: el.dataset.element || 0
-        });
-      });
-    };
-
-    vue.watch(folderId, attachListeners, {
+    var TREE = vue.ref(new Map());
+    var folderId = vue.ref(Array.from(TREE.value.keys())[0] || 0);
+    var explorer = vue.ref();
+    vue.watchEffect(function () {
+      if (!explorer.value) return;
+      explorer.value.querySelectorAll("button[data-layout]").forEach(function (el) {
+        return _layout.value = el.dataset.layout || "details";
+      }); // explorer.value.querySelectorAll<HTMLElement>("button[data-open]")
+      // explorer.value.querySelectorAll<HTMLElement>("button[data-rename]")
+    }, {
       flush: "post"
     });
-    vue.onMounted(function () {
-      attach("button[data-layout]", function (_, el) {
-        return _layout.value = el.dataset.layout || "details";
-      });
-      attachListeners();
-    });
     return {
-      tree: Tree,
       layoutType: _layout,
       folderId: folderId,
-      folders: vue.computed(function () {
-        var _Tree$value$get;
-
-        return ((_Tree$value$get = Tree.value.get(folderId.value)) === null || _Tree$value$get === void 0 ? void 0 : _Tree$value$get.folders) || [];
-      }),
-      files: vue.computed(function () {
-        var _Tree$value$get2;
-
-        return ((_Tree$value$get2 = Tree.value.get(folderId.value)) === null || _Tree$value$get2 === void 0 ? void 0 : _Tree$value$get2.files) || [];
-      }),
+      explorer: explorer,
       path: vue.computed(function () {
-        var path = []; // * Current folder
+        var _folderId$value;
 
-        var dt = Tree.value.get(folderId.value) || {};
-        path.push([folderId.value, dt.title, "current"]); // * Path
+        var path = [];
+        var isRoot = false;
+        var id = (_folderId$value = folderId.value) !== null && _folderId$value !== void 0 ? _folderId$value : 0;
 
-        if (dt.parentId) {
-          var _dt$parentId;
+        do {
+          if (!TREE.value.has(id)) isRoot = true;else {
+            var dt = TREE.value.get(id) || {};
 
-          var id = (_dt$parentId = dt.parentId) !== null && _dt$parentId !== void 0 ? _dt$parentId : null;
-
-          do {
-            var _dt = Tree.value.get(id);
-
-            if (_dt) {
-              if (!_dt.parentId) {
-                path.unshift([id, _dt.title, "root"]);
-                id = null;
-              } else {
-                path.unshift([id, _dt.title]);
-                id = _dt.parentId;
-              }
+            if (dt.parentId) {
+              path.unshift([id, dt.name]);
+              id = dt.parentId;
+            } else {
+              path.unshift([id, dt.name, true]);
+              isRoot = true;
             }
-          } while (id !== null);
-        }
+          }
+        } while (!isRoot);
 
         return path;
+      }),
+      content: vue.computed(function () {
+        return TREE.value.get(folderId.value) || {
+          folders: [],
+          files: []
+        };
       })
     };
   }
 });var _hoisted_1 = {
-  class: "vfe vue-file-explorer"
+  ref: "explorer",
+  class: "vue-file-explorer"
 };
 var _hoisted_2 = {
   class: "vfe-bar"
@@ -177,212 +129,68 @@ var _hoisted_3 = {
   class: "vfe-path"
 };
 var _hoisted_4 = {
-  key: 0
-};
-var _hoisted_5 = {
   class: "vfe-layout"
 };
 
-var _hoisted_6 = /*#__PURE__*/vue.createVNode("button", {
+var _hoisted_5 = /*#__PURE__*/vue.createVNode("button", {
   type: "button",
   "data-layout": "cards"
 }, "Cards Layout", -1);
 
-var _hoisted_7 = /*#__PURE__*/vue.createVNode("button", {
+var _hoisted_6 = /*#__PURE__*/vue.createVNode("button", {
   type: "button",
   "data-layout": "details"
 }, "Details Layout", -1);
 
-var _hoisted_8 = {
+var _hoisted_7 = {
   class: "vfe-content"
 };
-var _hoisted_9 = {
+var _hoisted_8 = {
   key: 0,
   class: "vfe-cards"
 };
-var _hoisted_10 = {
+var _hoisted_9 = {
   key: 1,
   class: "vfe-details"
 };
 
-var _hoisted_11 = /*#__PURE__*/vue.createVNode("li", {
-  class: "vfe-header"
-}, [/*#__PURE__*/vue.createVNode("span", null, "Id"), /*#__PURE__*/vue.createVNode("span", null, "Name"), /*#__PURE__*/vue.createVNode("span", null, "Actions")], -1);
+var _hoisted_10 = /*#__PURE__*/vue.createVNode("thead", null, [/*#__PURE__*/vue.createVNode("tr", null, [/*#__PURE__*/vue.createVNode("th", null, "Id"), /*#__PURE__*/vue.createVNode("th", null, "Name"), /*#__PURE__*/vue.createVNode("th", null, "Actions")])], -1);
 
-var _hoisted_12 = {
-  class: "vfe-actions"
-};
-var _hoisted_13 = {
-  class: "vfe-menu"
-};
-var _hoisted_14 = {
-  class: "vfe-actions"
-};
-var _hoisted_15 = {
-  class: "vfe-menu"
-};
+var _hoisted_11 = /*#__PURE__*/vue.createVNode("td", null, null, -1);
+
+var _hoisted_12 = /*#__PURE__*/vue.createVNode("td", null, null, -1);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return vue.openBlock(), vue.createBlock("div", _hoisted_1, [vue.createVNode("div", _hoisted_2, [vue.createVNode("div", _hoisted_3, [vue.renderSlot(_ctx.$slots, "folder-path", {
     path: _ctx.path
   }, function () {
-    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.path, function (_ref, i) {
-      var _ref2 = _slicedToArray(_ref, 3),
-          id = _ref2[0],
-          title = _ref2[1],
-          condition = _ref2[2];
-
-      return vue.openBlock(), vue.createBlock(vue.Fragment, {
-        key: i
-      }, [condition === 'current' ? (vue.openBlock(), vue.createBlock("span", _hoisted_4, vue.toDisplayString(title), 1)) : (vue.openBlock(), vue.createBlock("button", {
-        key: 1,
+    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.path, function (p, i) {
+      return vue.openBlock(), vue.createBlock("button", {
+        key: i,
         type: "button",
-        "data-open": id
-      }, vue.toDisplayString(title), 9, ["data-open"]))], 64);
+        "data-open": p[0]
+      }, vue.toDisplayString(p[1]), 9, ["data-open"]);
     }), 128))];
-  })]), vue.createVNode("div", null, vue.toDisplayString(_ctx.folderId), 1), vue.createVNode("div", _hoisted_5, [vue.renderSlot(_ctx.$slots, "layout-selector", {}, function () {
-    return [_hoisted_6, _hoisted_7];
-  })])]), vue.createVNode("div", _hoisted_8, [_ctx.layoutType === 'cards' ? (vue.openBlock(), vue.createBlock("div", _hoisted_9, [vue.renderSlot(_ctx.$slots, "cards-folders", {
-    folders: _ctx.folders
-  }, function () {
-    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.folders, function (f, i) {
-      return vue.openBlock(), vue.createBlock("div", {
-        key: i,
-        class: "vfe-folder"
-      }, [vue.renderSlot(_ctx.$slots, "cards-folder", {
-        id: f.id,
-        title: f.title,
-        data: f
-      }, function () {
-        return [vue.createVNode("button", {
-          type: "butten",
-          "data-open": f.id
-        }, vue.toDisplayString(f.id) + " - " + vue.toDisplayString(f.title), 9, ["data-open"])];
-      })]);
-    }), 128))];
-  }), vue.renderSlot(_ctx.$slots, "cards-files", {
-    files: _ctx.files
-  }, function () {
-    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.files, function (f, i) {
-      return vue.openBlock(), vue.createBlock("div", {
-        key: i,
-        class: "vfe-files"
-      }, [vue.renderSlot(_ctx.$slots, "cards-file", {
-        id: f.id,
-        title: f.title,
-        data: f
-      }, function () {
-        return [vue.createVNode("span", null, vue.toDisplayString(f.id) + " - " + vue.toDisplayString(f.title), 1)];
-      })]);
-    }), 128))];
-  })])) : (vue.openBlock(), vue.createBlock("ul", _hoisted_10, [vue.renderSlot(_ctx.$slots, "details-header", {}, function () {
-    return [_hoisted_11];
-  }), vue.renderSlot(_ctx.$slots, "details-folders", {
-    folders: _ctx.folders
-  }, function () {
-    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.folders, function (f, i) {
-      return vue.openBlock(), vue.createBlock("li", {
-        key: i,
-        class: "vfe-folder"
-      }, [vue.renderSlot(_ctx.$slots, "details-folder", {
-        id: f.id,
-        title: f.title,
-        data: f
-      }, function () {
-        return [vue.createVNode("span", null, vue.toDisplayString(f.id), 1), vue.createVNode("span", null, vue.toDisplayString(f.title), 1)];
-      }), vue.renderSlot(_ctx.$slots, "folder-actions", {
-        id: f.id
-      }, function () {
-        return [vue.createVNode("div", _hoisted_12, [vue.createVNode("label", {
-          for: "id-".concat(f.id)
-        }, "Actions", 8, ["for"]), vue.createVNode("input", {
-          type: "checkbox",
-          id: "id-".concat(f.id)
-        }, null, 8, ["id"]), vue.createVNode("div", _hoisted_13, [vue.renderSlot(_ctx.$slots, "folder-menu", {
-          id: f.id
-        }, function () {
-          return [vue.createVNode("button", {
-            type: "button",
-            "data-open": f.id
-          }, "Abrir", 8, ["data-open"]), vue.createVNode("button", {
-            type: "button",
-            "data-action": "rename",
-            "data-element": f.id
-          }, "Renombrar", 8, ["data-element"]), vue.createVNode("button", {
-            type: "button",
-            "data-action": "delete",
-            "data-element": f.id
-          }, "Eliminar", 8, ["data-element"])];
-        })])])];
-      })]);
-    }), 128))];
-  }), vue.renderSlot(_ctx.$slots, "details-files", {
-    files: _ctx.files
-  }, function () {
-    return [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.files, function (f, i) {
-      return vue.openBlock(), vue.createBlock("li", {
-        key: i,
-        class: "vfe-file"
-      }, [vue.renderSlot(_ctx.$slots, "details-file", {
-        id: f.id,
-        title: f.title,
-        data: f
-      }, function () {
-        return [vue.createVNode("span", null, vue.toDisplayString(f.id), 1), vue.createVNode("span", null, vue.toDisplayString(f.title), 1)];
-      }), vue.renderSlot(_ctx.$slots, "file-actions", {
-        id: f.id
-      }, function () {
-        return [vue.createVNode("div", _hoisted_14, [vue.createVNode("label", {
-          for: "id-".concat(f.id)
-        }, "Actions", 8, ["for"]), vue.createVNode("input", {
-          type: "checkbox",
-          id: "id-".concat(f.id)
-        }, null, 8, ["id"]), vue.createVNode("div", _hoisted_15, [vue.renderSlot(_ctx.$slots, "file-menu", {
-          id: f.id
-        }, function () {
-          return [vue.createVNode("button", {
-            type: "button",
-            "data-action": "open",
-            "data-element": f.id
-          }, "Abrir", 8, ["data-element"]), vue.createVNode("button", {
-            type: "button",
-            "data-action": "rename",
-            "data-element": f.id
-          }, "Renombrar", 8, ["data-element"]), vue.createVNode("button", {
-            type: "button",
-            "data-action": "delete",
-            "data-element": f.id
-          }, "Eliminar", 8, ["data-element"])];
-        })])])];
-      })]);
-    }), 128))];
-  })]))])]);
-}function styleInject(css, ref) {
-  if ( ref === void 0 ) ref = {};
-  var insertAt = ref.insertAt;
-
-  if (!css || typeof document === 'undefined') { return; }
-
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var style = document.createElement('style');
-  style.type = 'text/css';
-
-  if (insertAt === 'top') {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}var css_248z = "\n.vue-file-explorer {\n  display: flex;\n  flex-direction: column;\n}\n.vfe-bar {\n  display: flex;\n  justify-content: space-between;\n}\n/* .vfe-path */\n/* .vfe-layout */\n\n/* .vfe-content */\n/* .vfe-cards */\n.vfe-details {\n  display: flex;\n  flex-direction: column;\n}\n.vfe-details > * {\n  display: flex;\n  justify-content: space-between;\n}\n\n/* .vfe-header */\n/* .vfe-folder */\n/* .vfe-file */\n.vfe-actions {\n  position: relative;\n}\n.vfe-menu {\n  z-index: -1;\n  position: absolute;\n  right: 0;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  opacity: 0;\n  height: 0;\n  width: 0;\n}\n.vfe-actions > label {\n  user-select: none;\n}\n.vfe-actions > input {\n  display: none;\n}\n.vfe-actions > input:checked + .vfe-menu {\n  z-index: 1;\n  height: auto;\n  width: auto;\n  opacity: 1;\n}\n";
-styleInject(css_248z);script.render = render;// Import vue component
+  })]), vue.createVNode("div", _hoisted_4, [vue.renderSlot(_ctx.$slots, "layout-selector", {}, function () {
+    return [_hoisted_5, _hoisted_6];
+  })])]), vue.createVNode("div", _hoisted_7, [_ctx.layoutType === 'cards' ? (vue.openBlock(), vue.createBlock("div", _hoisted_8)) : (vue.openBlock(), vue.createBlock("table", _hoisted_9, [vue.createVNode("table", null, [vue.renderSlot(_ctx.$slots, "thead", {}, function () {
+    return [_hoisted_10];
+  }), vue.renderSlot(_ctx.$slots, "tbody", {}, function () {
+    return [vue.createVNode("tbody", null, [(vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.content.folders, function (_ref, i) {
+      var id = _ref.id,
+          name = _ref.name;
+      return vue.openBlock(), vue.createBlock("tr", {
+        key: i
+      }, [vue.createVNode("td", null, vue.toDisplayString(id), 1), vue.createVNode("td", null, vue.toDisplayString(name), 1), _hoisted_11]);
+    }), 128)), (vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList(_ctx.content.files, function (_ref2, i) {
+      var id = _ref2.id,
+          name = _ref2.name;
+      return vue.openBlock(), vue.createBlock("tr", {
+        key: i
+      }, [vue.createVNode("td", null, vue.toDisplayString(id), 1), vue.createVNode("td", null, vue.toDisplayString(name), 1), _hoisted_12]);
+    }), 128))])];
+  })])]))])], 512);
+}script.render = render;// Import vue component
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
