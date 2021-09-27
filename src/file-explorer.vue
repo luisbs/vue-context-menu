@@ -3,7 +3,7 @@ import { defineComponent, computed, ref, watchEffect } from "vue"
 import { Folder } from "vue-file-explorer"
 
 export default /*#__PURE__*/ defineComponent({
-  name: "FileExplorer",
+  name: "VueFileExplorer",
   emits: ["initialLoad", "load", "rename"],
   props: {
     layout: {
