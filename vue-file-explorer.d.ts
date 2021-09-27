@@ -4,8 +4,8 @@ declare const ContextMenu: DefineComponent<{}, {}, any> & { install: Exclude<Plu
 export default ContextMenu
 
 export interface Folder {
-  parentId: number | string | null
-  name: string
-  folders: Array<{ id: number; name: string; data: any }>
-  files: Array<{ id: number; name: string; data: any }>
+  parentId?: string | null
+  title: string
+  folders: Array<{ id: string; title: string }>
+  files: Array<{ id: string; title: string }>
 }
