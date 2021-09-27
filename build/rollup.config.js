@@ -26,7 +26,7 @@ const argv = minimist(process.argv.slice(2))
 const projectRoot = path.resolve(__dirname, "..")
 
 // Common part of the name for the files
-const fileName = "dist/vue-file-explorer"
+const fileName = "dist/vue-context-menu"
 
 const baseConfig = {
   input: "src/entry.ts",
@@ -127,7 +127,7 @@ if (!argv.format || argv.format === "cjs") {
       compact: true,
       file: `${fileName}.ssr.js`,
       format: "cjs",
-      name: "FileExplorer",
+      name: "ContextMenu",
       exports: "auto",
       globals,
     },
@@ -150,7 +150,7 @@ if (!argv.format || argv.format === "iife") {
       compact: true,
       file: `${fileName}.min.js`,
       format: "iife",
-      name: "FileExplorer",
+      name: "ContextMenu",
       exports: "auto",
       globals,
     },

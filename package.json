@@ -1,18 +1,18 @@
 {
-  "name": "vue-file-explorer",
-  "version": "0.1.0",
-  "description": "Emulate a file explorer",
+  "name": "vue-context-menu",
+  "version": "1.9.0",
+  "description": "Support for contextual menus on vue",
   "license": "MIT",
   "author": "luisbs (https://github.com/luisbs/)",
-  "repository": "https://github.com/luisbs/vue-file-explorer",
-  "main": "dist/vue-file-explorer.ssr.js",
-  "browser": "dist/vue-file-explorer.esm.js",
-  "module": "dist/vue-file-explorer.esm.js",
-  "unpkg": "dist/vue-file-explorer.min.js",
-  "types": "vue-file-explorer.d.ts",
+  "repository": "https://github.com/luisbs/vue-context-menu",
+  "main": "dist/vue-context-menu.ssr.js",
+  "browser": "dist/vue-context-menu.esm.js",
+  "module": "dist/vue-context-menu.esm.js",
+  "unpkg": "dist/vue-context-menu.min.js",
+  "types": "vue-context-menu.d.ts",
   "files": [
     "dist/*",
-    "vue-file-explorer.d.ts"
+    "vue-context-menu.d.ts"
   ],
   "sideEffects": false,
   "scripts": {
@@ -22,7 +22,9 @@
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
   },
-  "dependencies": {},
+  "dependencies": {
+    "click-outside-vue3": "https://github.com/andymark-by/click-outside-vue3.git"
+  },
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
